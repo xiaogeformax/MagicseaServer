@@ -141,7 +141,7 @@ func (p *MsgParser) Write(conn *TCPConn, args ...[]byte) error {
 		l += len(args[i])
 	}
 
-	conn.Write(msg)
+	conn.Write(msg)  //最后将msg发送出去
 
 	return nil
 

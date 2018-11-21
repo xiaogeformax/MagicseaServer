@@ -93,6 +93,7 @@ func (server *TCPServer) run() {
 			log.Debug("too many connections")
 			continue
 		}
+		//将conn放入conns中，用于后期close的处理
 		server.conns[conn] = struct{}{}
 		server.mutexConns.Unlock()
 
@@ -100,7 +101,7 @@ func (server *TCPServer) run() {
 
 		tcpConn := newTCPCoon(conn, server.PendingWriteNum, server.msgParser)
 		fmt.Println("new conn  from ", tcpConn.RemoteAddr())
-		agent := server.NewAgent(tcpConn)
+		agent := server.NewAgent(tcpConn) //将tcpconn生成agent
 
 		go func() {
 			agent.Run()

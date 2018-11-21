@@ -5,7 +5,7 @@ import (
 	"sync"
 	"mqant/log"
 )
-
+//连接的一个封装
 type ConnSet map[net.Conn]struct{}
 
 type TCPConn struct {

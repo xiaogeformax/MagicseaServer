@@ -4,7 +4,8 @@ import (
 	"time"
 	"github.com/magicsea/ganet/network"
 	"github.com/AsynkronIT/protoactor-go/actor"
-	"log"
+
+	"github.com/labstack/gommon/log"
 )
 
 type IGateService interface {
@@ -37,6 +38,30 @@ func (gate *Gate) Run(gs IGateService) {
 
 	//todo websock
 
+	var wsServer *network.WSServer
+	if gate.WSAddr != "" {
+		wsServer = new(network.WSServer)
+		wsServer.Addr = gate.WSAddr
+		wsServer.MaxConnNum = gate.MaxConnNum
+		wsServer.PendingWriteNum = gate.PendingWriteNum
+		wsServer.MaxMsgLen = gate.MaxMsgLen
+		wsServer.HTTPTimeout = gate.HTTPTimeout
+		wsServer.CertFile = gate.CertFile
+		wsServer.KeyFile = gate.KeyFile
+		wsServer.NewAgent = func(conn *network.WSConn) network.Agent {
+			a := &GFAgent{conn: conn, gate: gate, netType: WEB_SOCKET}
+			//if gate.AgentChanRPC != nil {
+			//	gate.AgentChanRPC.Go("NewAgent", a)
+			//}
+			ac, err := gs.GetAgentActor(a)
+			if err != nil {
+				//todo:应该不会发生吧
+				log.Error("NewAgent fail:%v", err.Error())
+			}
+			a.agentActor = ac
+			return a
+		}
+	}
 
 	var tcpServer *network.TCPServer
 
@@ -58,22 +83,27 @@ func (gate *Gate) Run(gs IGateService) {
 			ac, err := gs.GetAgentActor(a)
 			if err != nil {
 				//todo:应该不会发生吧
-				log.Println("NewAgent fail:%v", err.Error())
+				log.Info("NewAgent fail:%v", err.Error())
 			}
 			a.agentActor = ac
 			return a
 		}
 	}
-	//todo websock
+	if wsServer != nil {
+		wsServer.Start()
+	}
 
 	if tcpServer != nil {
 		tcpServer.Start()
 	}
 	gate.tcpServer = tcpServer
+	gate.wsServer = wsServer
 }
 
 func (gate *Gate) OnDestroy() {
-	//todo websock
+	if gate.wsServer != nil {
+		gate.wsServer.Close()
+	}
 	if gate.tcpServer != nil {
 		gate.tcpServer.Close()
 	}

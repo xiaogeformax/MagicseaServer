@@ -1,25 +1,17 @@
-package service_test
-
+package service
 
 import (
 	"testing"
-	"fmt"
-	"time"
-    "service"
-	//. "github.com/magicsea/ganet/service"
 	"github.com/AsynkronIT/protoactor-go/actor"
-
-
-
-
-
+	"time"
+	"fmt"
 )
 
 type hello struct {
 	Who string
 }
 
-func Example(t *testing.T) {
+func Test1(t *testing.T) {
 	fmt.Println("service_test Example pass")
 	props := actor.FromInstance(&BaseServer{})
 	pid := actor.Spawn(props)
@@ -28,3 +20,13 @@ func Example(t *testing.T) {
 	fmt.Println("service_test Example pass")
 	pid.GracefulStop()
 }
+/*func Example(t *testing.T) {
+	fmt.Println("service_test Example pass")
+	props := actor.FromInstance(&BaseServer{})
+	pid := actor.Spawn(props)
+	pid.Tell(&hello{Who: "Roger"})
+	time.Sleep(1)
+	fmt.Println("service_test Example pass")
+	pid.GracefulStop()
+}
+*/

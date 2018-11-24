@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	"net"
 	"log"
+	"errors"
 )
 
 type WebsocketConnSet map[*websocket.Conn]struct{}
@@ -112,12 +113,11 @@ func (wsConn *WSConn) WriteMsg(args ...[]byte) error {
 		msgLen += uint32(len(args[i]))
 	}
 
-	//todo error
 	// check len
 	if msgLen > wsConn.maxMsgLen {
-		return nil
+		return errors.New("message too long")
 	} else if msgLen < 1 {
-		return nil
+		return errors.New("message too short")
 	}
 
 	// don't copy

@@ -7,6 +7,7 @@ import (
 	"time"
 	"fmt"
 	"path"
+	"errors"
 )
 
 // levels
@@ -43,8 +44,7 @@ func New(strLevel string, pathhead string, pathname string, flag int) (*Logger, 
 	case "fatal":
 		level = fatalLevel
 	default:
-		//todo error
-		return nil, nil
+		return nil,  errors.New("unknown level: " + strLevel)
 
 	}
 

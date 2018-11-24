@@ -2,10 +2,11 @@ package gateframework
 
 import (
 	"net"
-	"MagicseaServerDemo/network"
+
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"log"
 	"reflect"
+	"github.com/magicsea/ganet/network"
 )
 
 type NetType byte

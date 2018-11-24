@@ -4,6 +4,7 @@ import (
 	"math"
 	"io"
 	"encoding/binary"
+	"errors"
 )
 
 // --------------
@@ -87,12 +88,12 @@ func (p *MsgParser) Read(conn *TCPConn) ([]byte, error) {
 			msgLen = binary.BigEndian.Uint32(bufMsgLen)
 		}
 	}
-	//TODO  nil error
+
 	//check len
 	if msgLen>p.maxMsgLen{
-		return nil,nil
+		return nil,errors.New("message too long")
 	} else if msgLen < p.minMsgLen {
-		return nil, nil
+		return nil, errors.New("message too short")
 	}
 	msgData := make([]byte, msgLen)
 	if _, err := io.ReadFull(conn, msgData); err != nil {

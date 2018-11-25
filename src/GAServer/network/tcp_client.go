@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 	"fmt"
-	"log"
 	"net"
 )
 

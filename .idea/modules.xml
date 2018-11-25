@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/MagicseaServer.iml" filepath="$PROJECT_DIR$/.idea/MagicseaServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/MagicseaServerDemo.iml" filepath="$PROJECT_DIR$/.idea/MagicseaServerDemo.iml" />
     </modules>
   </component>

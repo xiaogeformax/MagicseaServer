@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"log"
-	
+	"MagicseaServer/Server/config"
+	"MagicseaServer/GAServer/app"
+
 )
 
 var (
@@ -18,6 +20,8 @@ func main(){
 		log.Println("load config err:", err)
 		return
 	}
+
+	app.RegisterService(center.Type(), center.Service)
 	log.Println("===Run===", conf)
 }
 

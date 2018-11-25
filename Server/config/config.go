@@ -1,17 +1,17 @@
 package config
 
 import (
-
-	//"GAServer/config"
+	"MagicseaServer/GAServer/config"
 
 	"io/ioutil"
 	"encoding/json"
 
+
 )
 
 type Config struct {
-	config.ServiceConfig
-	//Base         config.ServiceConfig `json:"config"`
+
+	Base         config.ServiceConfig `json:"config"`
 	DB           map[string]string    `json:"db"`
 	DesignConfig map[string]string    `json:"design"`
 	Ver          string               `json:"ver"`

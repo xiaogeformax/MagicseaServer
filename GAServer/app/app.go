@@ -1,4 +1,4 @@
-package App
+package app
 
 import (
 	. "github.com/magicsea/ganet/config"

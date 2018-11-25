@@ -57,6 +57,14 @@ func Info(format string, a ...interface{}) {
 	}
 }
 
+func Println(format string, a ...interface{}) {
+	//str := fmt.Sprint(a)
+	for _, v := range gGroup.loggers {
+		v.Info(format, a...)
+	}
+
+}
+
 func _println(format string, a ...interface{}) {
 	//str := fmt.Sprint(a)
 	for _, v := range gGroup.loggers {

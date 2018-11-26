@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 	"github.com/gorilla/websocket"
-	"github.com/labstack/gommon/log"
+	"MagicseaServer/GAServer/log"
 )
 
 type WSClient struct {

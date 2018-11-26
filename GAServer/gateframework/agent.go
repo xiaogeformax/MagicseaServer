@@ -6,7 +6,7 @@ import (
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"log"
 	"reflect"
-	"github.com/magicsea/ganet/network"
+	"MagicseaServer/GAServer/network"
 )
 
 type NetType byte

@@ -3,7 +3,7 @@ package network
 import (
 	"net"
 	"sync"
-	"github.com/magicsea/ganet/log"
+	"MagicseaServer/GAServer/log"
 	"time"
 	"fmt"
 )

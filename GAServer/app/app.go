@@ -1,11 +1,11 @@
 package app
 
 import (
-	. "github.com/magicsea/ganet/config"
-	"github.com/magicsea/ganet/service"
-	"github.com/magicsea/ganet/module"
+	. "MagicseaServer/GAServer/config"
+	"MagicseaServer/GAServer/service"
+	"MagicseaServer/GAServer/module"
 
-	"github.com/magicsea/ganet/log"
+	"MagicseaServer/GAServer/log"
 	"github.com/magicsea/ganet/util"
 	"os/signal"
 	"os"

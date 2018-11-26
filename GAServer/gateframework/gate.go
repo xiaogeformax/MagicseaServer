@@ -2,10 +2,10 @@ package gateframework
 
 import (
 	"time"
-	"github.com/magicsea/ganet/network"
+	"MagicseaServer/GAServer/network"
 	"github.com/AsynkronIT/protoactor-go/actor"
 
-	"github.com/labstack/gommon/log"
+	"MagicseaServer/GAServer/log"
 )
 
 type IGateService interface {

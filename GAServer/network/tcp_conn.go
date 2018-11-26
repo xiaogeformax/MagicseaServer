@@ -4,7 +4,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/magicsea/ganet/log"
+	"MagicseaServer/GAServer/log"
 )
 //连接的一个封装
 type ConnSet map[net.Conn]struct{}

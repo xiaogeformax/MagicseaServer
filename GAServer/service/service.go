@@ -5,7 +5,7 @@ import (
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"reflect"
 	"fmt"
-	"github.com/magicsea/ganet/log"
+	"MagicseaServer/GAServer/log"
 	"github.com/AsynkronIT/protoactor-go/remote"
 )
 

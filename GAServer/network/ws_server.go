@@ -7,7 +7,7 @@ import (
 	"sync"
 	"net/http"
 	"crypto/tls"
-	"github.com/labstack/gommon/log"
+	"MagicseaServer/GAServer/log"
 )
 
 type WSServer struct {

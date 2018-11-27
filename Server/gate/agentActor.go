@@ -8,6 +8,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"errors"
 	"MagicseaServer/gameproto"
+
+	"MagicseaServer/Server/cluster"
 	"time"
 )
 type AgentActor struct {
@@ -47,10 +49,9 @@ func (ab *AgentActor) Receive(context actor.Context) {
 		ab.bindAgent.SetDead() //被动死亡，防止二次关闭
 		ab.bindAgent.Close()   //关闭连接
 	case *msgs.ClientDisconnect:
-		//上报 todo
 		if ab.baseInfo != nil {
-			//ss := cluster.GetServicePID("session")
-			//ss.Tell(&msgs.UserLeave{Uid: ab.baseInfo.Uid, From: msgs.ST_GateServer, Reason: "client disconnect"})
+			ss := cluster.GetServicePID("session")
+			ss.Tell(&msgs.UserLeave{Uid: ab.baseInfo.Uid, From: msgs.ST_GateServer, Reason: "client disconnect"})
 		}
 		ab.OnStop()
 		context.Self().Stop()
@@ -60,6 +61,22 @@ func (ab *AgentActor) Receive(context actor.Context) {
 		ab.ReceviceClientMsg(msg.Rawdata)
 	}
 }
+
+func (ab *AgentActor) GetChannelServer(channel msgs.ChannelType) *actor.PID {
+	c := msgs.ChannelType(int(channel) / 100 * 100) //简单对应
+	//log.Info("GetChannelServer,%v,%v", channel, c)
+	if ab.bindServers == nil {
+		return nil
+	}
+	for _, v := range ab.bindServers {
+		//log.Info("try GetChannelServer,%v", v.Channel)
+		if v.Channel == c {
+			return v.GetPid()
+		}
+	}
+	return nil
+}
+
 
 //收到前端消息
 func (ab *AgentActor) ReceviceClientMsg(data []byte) error {
@@ -94,11 +111,11 @@ func (ab *AgentActor) CheckLogin(pack *NetPack) error {
 	}
 
 	//todo cluster
-	//pretime := time.Now()
-	//smsg := &msgs.ServerCheckLogin{Uid: uint64(msg.PlatformUid), Key: msg.Key, AgentPID: ab.pid}
-	//result, err := cluster.GetServicePID("session").Ask(smsg)
+	pretime := time.Now()
+	smsg := &msgs.ServerCheckLogin{Uid: uint64(msg.PlatformUid), Key: msg.Key, AgentPID: ab.pid}
+	result, err := cluster.GetServicePID("session").Ask(smsg)
 
-	/*if err == nil {
+	if err == nil {
 		checkResult := result.(*msgs.CheckLoginResult)
 		if checkResult.Result == msgs.OK {
 			//登录成功
@@ -117,9 +134,23 @@ func (ab *AgentActor) CheckLogin(pack *NetPack) error {
 
 	} else {
 		log.Error("CheckLogin error :" + err.Error())
-	}*/
+	}
 
 	return nil
+}
+//发送消息到客户端
+func (ab *AgentActor) SendClient(c msgs.ChannelType, msgId byte, msg proto.Message) {
+	pack := new(NetPack)
+	pack.channel = c
+	pack.msgID = msgId
+	mdata, err := proto.Marshal(msg)
+	if err != nil {
+		log.Error("SendClient marshal error:%v", err)
+		return
+	}
+	pack.rawData = mdata
+	//log.Info("sendclient:msg%v,data:%d=>%v", pack.msgID, len(pack.rawData), pack.rawData)
+	ab.SendClientPack(pack)
 }
 
 func (ab *AgentActor) SendClientPack(pack *NetPack) {
@@ -127,6 +158,34 @@ func (ab *AgentActor) SendClientPack(pack *NetPack) {
 	ab.bindAgent.WriteMsg(data)
 }
 
+//转发
+func (ab *AgentActor) forward(pack *NetPack) error {
+	channel := pack.channel
+	msgid := pack.msgID
+	//test gate
+	//if channel == byte(msgs.Shop) {
+	//	ab.SendClient(msgs.Shop, byte(msgs.S2C_ShopBuy), &msgs.S2C_ShopBuyMsg{ItemId: 1, Result: msgs.OK})
+	//	return nil
+	//}
+
+	pid := ab.GetChannelServer(channel)
+	if pid == nil {
+		log.Error("forward server nil:%+v,c=%v,m=%v", pid, channel, msgid)
+		return nil
+	}
+
+	frame := &msgs.FrameMsg{channel, uint32(msgid), pack.rawData}
+	pid.Tell(frame)
+	//r, e := pid.RequestFuture(frame, time.Second*3).Result()
+	//if e != nil {
+	//	log.Error("forward error:id=%v, err=%v", ab.baseInfo.Uid, e)
+	//}
+
+	//rep := r.(*msgs.FrameMsgRep)
+	//repMsg := &gameproto.S2C_ConfirmInfo{MsgHead: int32(msgid), Code: int32(rep.ErrCode)}
+	//ab.SendClient(msgs.GameServer, byte(gameproto.S2C_CONFIRM), repMsg)
+	return nil
+}
 
 func (ab *AgentActor) OnStop() {
 	if ab.verified && ab.baseInfo != nil {

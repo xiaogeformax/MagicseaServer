@@ -10,6 +10,7 @@ import (
 	"MagicseaServer/GAServer/config"
 	"github.com/magicsea/ganet/util"
 	"time"
+	"MagicseaServer/Server/cluster"
 )
 
 type GateService struct{
@@ -87,10 +88,10 @@ func (s *GateService) OnStart(as *service.ActorService) {
 	gate.Run(s)
 
 	//注册
-	//val := &msgs.ServiceValue{"TcpAddr", config.GetServiceConfigString(s.Name, "TcpAddr")}
+	val := &msgs.ServiceValue{"TcpAddr", config.GetServiceConfigString(s.Name, "TcpAddr")}
 
 	//todo cluster
-	//cluster.RegServerWork(&s.ServiceData, []*msgs.ServiceValue{val})
+	cluster.RegServerWork(&s.ServiceData, []*msgs.ServiceValue{val})
 
 	//定时任务
 	util.StartLoopTask(time.Second*5, func() {
@@ -100,8 +101,8 @@ func (s *GateService) OnStart(as *service.ActorService) {
 
 func (s *GateService) OnTick(context service.Context) {
 	// todo cluster
-	//load := len(s.agents)
-	//cluster.UpdateServiceLoad(s.Name, uint32(load), msgs.ServiceStateFree)
+	load := len(s.agents)
+	cluster.UpdateServiceLoad(s.Name, uint32(load), msgs.ServiceStateFree)
 }
 
 

@@ -13,6 +13,7 @@ type hello struct {
 
 func Test1(t *testing.T) {
 	fmt.Println("service_test Example pass")
+	//actor.FromProducer(func() actor.Actor {&BaseServer{}})
 	props := actor.FromInstance(&BaseServer{})
 	pid := actor.Spawn(props)
 	pid.Tell(&hello{Who: "Roger"})

@@ -6,6 +6,7 @@ import (
 	"MagicseaServer/Server/config"
 	"MagicseaServer/GAServer/app"
 	"MagicseaServer/Server/center"
+	"MagicseaServer/Server/login"
 )
 
 var (
@@ -22,6 +23,7 @@ func main(){
 	}
 
 	app.RegisterService(center.Type(), center.Service)
+	app.RegisterService(login.Type(), login.Service)
 	log.Println("===Run===", conf)
 }
 

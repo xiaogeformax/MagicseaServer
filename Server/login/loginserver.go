@@ -8,7 +8,7 @@ import (
 	"MagicseaServer/GAServer/log"
 	"strings"
 	"strconv"
-	"ga_server/src/Server/cluster"
+	"MagicseaServer/Server/cluster"
 	"MagicseaServer/gameproto/msgs"
 	"MagicseaServer/gameproto"
 	"github.com/gogo/protobuf/proto"

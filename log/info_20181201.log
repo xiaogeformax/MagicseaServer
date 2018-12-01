@@ -84,3 +84,14 @@
 12:19:39 app.go:85: [INFO] run services.
 12:19:39 app.go:87: [INFO] run服务:login
 12:19:39 app.go:87: [INFO] run服务:center
+16:22:51 app.go:44: [INFO] log.started
+16:22:51 app.go:61: [INFO] 生成服务:login
+16:22:51 app.go:61: [INFO] 生成服务:center
+16:22:51 app.go:71: [INFO] init服务:login
+16:22:51 app.go:71: [INFO] init服务:center
+16:22:51 app.go:77: [INFO] start服务:login
+16:22:51 app.go:77: [INFO] start服务:center
+16:22:51 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+16:22:51 app.go:82: [INFO] run services.
+16:22:51 app.go:84: [INFO] run服务:login
+16:22:51 app.go:84: [INFO] run服务:center

@@ -1,0 +1,86 @@
+10:42:52 app.go:44: [INFO] log.started
+10:44:34 app.go:44: [INFO] log.started
+10:44:58 app.go:44: [INFO] log.started
+10:44:58 app.go:61: [INFO] 生成服务:center
+10:45:47 app.go:44: [INFO] log.started
+10:45:47 app.go:61: [INFO] 生成服务:login
+10:45:47 app.go:61: [INFO] 生成服务:center
+10:50:30 app.go:44: [INFO] log.started
+10:51:05 app.go:44: [INFO] log.started
+10:51:05 app.go:61: [INFO] 生成服务:login
+10:51:05 app.go:61: [INFO] 生成服务:center
+10:51:38 app.go:44: [INFO] log.started
+10:51:38 app.go:61: [INFO] 生成服务:login
+10:51:38 app.go:61: [INFO] 生成服务:center
+10:53:15 app.go:44: [INFO] log.started
+10:53:15 app.go:52: [INFO] ==========start服务 脚本 ===========
+10:53:15 app.go:63: [INFO] 生成服务:login
+10:53:15 app.go:63: [INFO] 生成服务:center
+10:53:41 app.go:44: [INFO] log.started
+10:53:41 app.go:56: [INFO] ==========start服务 脚本 ===========
+10:53:41 app.go:63: [INFO] 生成服务:login
+10:53:41 app.go:63: [INFO] 生成服务:center
+11:17:27 app.go:44: [INFO] log.started
+11:17:42 app.go:44: [INFO] log.started
+11:17:42 app.go:63: [INFO] 生成服务:login
+11:17:42 app.go:63: [INFO] 生成服务:center
+11:23:25 app.go:44: [INFO] log.started
+11:25:07 app.go:44: [INFO] log.started
+11:25:13 app.go:63: [INFO] 生成服务:login
+11:25:13 app.go:63: [INFO] 生成服务:center
+11:25:13 app.go:70: [INFO] ==========start服务 脚本 ===========
+11:25:13 app.go:73: [INFO] init服务:login
+11:25:13 app.go:73: [INFO] init服务:center
+11:25:17 app.go:80: [INFO] start服务:login
+11:25:17 loginserver.go:39: [INFO] 打开  loginServer
+11:25:17 app.go:80: [INFO] start服务:center
+11:25:17 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+11:25:17 app.go:85: [INFO] run services.
+11:25:17 app.go:87: [INFO] run服务:login
+11:25:17 app.go:87: [INFO] run服务:center
+11:26:45 loginserver.go:67: [INFO] login account:%!(EXTRA string=123)
+11:26:45 loginserver.go:67: [INFO] login account:%!(EXTRA string=123)
+11:26:51 loginserver.go:67: [INFO] login account:%!(EXTRA string=123)
+11:26:53 loginserver.go:67: [INFO] login account:%!(EXTRA string=123)
+11:28:01 loginserver.go:67: [INFO] login account:%!(EXTRA string=123)
+12:11:00 app.go:44: [INFO] log.started
+12:11:00 app.go:63: [INFO] 生成服务:login
+12:11:00 app.go:63: [INFO] 生成服务:center
+12:11:00 app.go:70: [INFO] ==========start服务 脚本 ===========
+12:11:00 app.go:73: [INFO] init服务:login
+12:11:00 app.go:73: [INFO] init服务:center
+12:11:00 app.go:80: [INFO] start服务:login
+12:11:00 loginserver.go:39: [INFO] 打开  loginServer
+12:11:00 app.go:80: [INFO] start服务:center
+12:11:00 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+12:13:05 app.go:44: [INFO] log.started
+12:13:05 app.go:63: [INFO] 生成服务:login
+12:13:05 app.go:63: [INFO] 生成服务:center
+12:13:05 app.go:70: [INFO] ==========start服务 脚本 ===========
+12:13:05 app.go:73: [INFO] init服务:login
+12:13:05 app.go:73: [INFO] init服务:center
+12:13:05 app.go:80: [INFO] start服务:login
+12:13:05 app.go:80: [INFO] start服务:center
+12:13:05 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+12:15:36 loginserver.go:67: [INFO] login account:%!(EXTRA string=12)
+12:18:14 app.go:44: [INFO] log.started
+12:18:14 app.go:63: [INFO] 生成服务:login
+12:18:14 app.go:63: [INFO] 生成服务:center
+12:18:14 app.go:70: [INFO] ==========start服务 脚本 ===========
+12:18:14 app.go:73: [INFO] init服务:login
+12:18:14 app.go:73: [INFO] init服务:center
+12:18:14 app.go:80: [INFO] start服务:login
+12:18:14 app.go:80: [INFO] start服务:center
+12:18:14 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+12:19:39 app.go:44: [INFO] log.started
+12:19:39 app.go:63: [INFO] 生成服务:login
+12:19:39 app.go:63: [INFO] 生成服务:center
+12:19:39 app.go:70: [INFO] ==========start服务 脚本 ===========
+12:19:39 app.go:73: [INFO] init服务:login
+12:19:39 app.go:73: [INFO] init服务:center
+12:19:39 app.go:80: [INFO] start服务:login
+12:19:39 app.go:80: [INFO] start服务:center
+12:19:39 loginserver.go:46: [INFO] login listen http:%!(EXTRA string=login, string=  , string=127.0.0.1:9900)
+12:19:39 app.go:85: [INFO] run services.
+12:19:39 app.go:87: [INFO] run服务:login
+12:19:39 app.go:87: [INFO] run服务:center

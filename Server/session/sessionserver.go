@@ -38,3 +38,16 @@ func (s *SessionService) OnStart(as *service.ActorService) {
 	as.RegisterMsg(reflect.TypeOf(&msgs.GetSessionInfoByName{}), s.GetSessionInfoByName) //查询玩家信息通过名字
 	as.RegisterMsg(reflect.TypeOf(&msgs.UserLeave{}), s.OnUserLeave)
 }
+
+func (s *SessionService) OnUserCheckLoginGsBack(context service.Context) {
+	fmt.Println("SessionService.OnUserCheckLogin:", context.Message())
+	cresult := context.Message().(*msgs.CreatePlayerResult)
+
+	//踢掉老玩家
+	id:= cresult.BaseInfo.Uid
+	oldSession := s.sessionMgr.GetSession(id)
+	if oldSession != nil {
+		oldSession.Kick("try kick same", msgs.ST_NONE)
+		s.sessionMgr.RemoveSession(id)
+	}
+}

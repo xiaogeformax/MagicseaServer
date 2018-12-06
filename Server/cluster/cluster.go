@@ -50,8 +50,8 @@ func GetServicePID(serviceName string) *RemoteClient {
 }
 
 func createClient(addr string, serviceName string) *RemoteClient {
-	mutex.Lock()
-	defer mutex.Unlock()
+	//mutex.Lock()
+	//defer mutex.Unlock()
 	fmt.Println("createClient:", serviceName, addr)
 	r := &RemoteClient{}
 	if addr != "" {
@@ -59,7 +59,7 @@ func createClient(addr string, serviceName string) *RemoteClient {
 	} else {
 		r.pid = actor.NewLocalPID(serviceName)
 	}
-	remoteClients[serviceName] = r
+	//remoteClients[serviceName] = r
 	return r
 }
 

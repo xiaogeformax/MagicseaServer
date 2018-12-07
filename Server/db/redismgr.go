@@ -32,10 +32,13 @@ type RedisMgr struct {
 func (mgr *RedisMgr) OnInit() bool {
       if config.GetAppConf().Redis != nil{
       	//todo
-		  //for _, v := range config.GetAppConf().Redis.DBs {
-		  	//if !mgr.NewRe
-		  //}
+		  for _, v := range config.GetAppConf().Redis.DBs {
+			  if !mgr.NewRedisClient(v, config.GetAppConf().Redis.Addr, config.GetAppConf().Redis.PoolSize, config.GetAppConf().Redis.Password) {
+				  return false
+			  }
+		  }
 	  }
+	  return true
 }
 
 func NewRedisMgr() *RedisMgr {
@@ -64,4 +67,42 @@ func (mgr *RedisMgr) NewRedisClient(dbIndex int, addr string, poolsize int, pass
 	}
 	mgr.clients[RedisDBUse(dbIndex)] = redclient
 	return true
+}
+
+func (mgr *RedisMgr) Run() {
+
+}
+
+func (mgr *RedisMgr) OnDestroy() {
+}
+
+func GetRedisDB(dbIndex RedisDBUse) *redis.Client {
+	if client, b := redisMgr.clients[dbIndex]; b {
+		return client
+	}
+	log.Error("GetRedisDB no exist:%v",dbIndex)
+	return nil
+}
+
+func GetRedisGame() *redis.Client {
+	return GetRedisDB(RedisDBUseGame)
+}
+
+func GetRedisBattleLoad() *redis.Client {
+	return GetRedisDB(RedisDBUseBattleLoad)
+}
+
+func GetRedisBattle() *redis.Client {
+	return GetRedisDB(RedisDBUseBattleInfo)
+}
+
+func GetRedisFriend() *redis.Client {
+	return GetRedisDB(RedisDBFriend)
+}
+
+func GetRedisGuild() *redis.Client {
+	return GetRedisDB(RedisDBGuild)
+}
+func GetRedisConfig() *redis.Client {
+	return GetRedisDB(RedisDBConfig)
 }

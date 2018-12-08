@@ -14,17 +14,14 @@
 		HeartBeatMsg
 		C2S_ShopBuyMsg
 		S2C_ShopBuyMsg
-		C2S_PrivateChatMsg
-		S2C_PrivateChatMsg
-		S2C_PrivateOtherChatMsg
-		C2S_WorldChatMsg
-		S2C_WorldChatMsg
 		FrameMsg
+		FrameMsgJson
 		FrameMsgReq
 		FrameMsgRep
 		UnicastFrameMsg
 		MulticastFrameMsg
 		BroadcastFrameMsg
+		BroadcastFrameMsgJson
 		AddAgentToParent
 		RemoveAgentFromParent
 		NewChild
@@ -34,6 +31,7 @@
 		SpawnAgent
 		ServiceValue
 		AddService
+		AddServiceRep
 		SendOK
 		RemoveService
 		ApplyService
@@ -57,6 +55,26 @@
 		CreatePlayerResult
 		PlayerOutline
 		Tick
+		TimeFlush
+		BattleRoomInfo
+		GetLobbyInfo
+		LobbyQueueData
+		BattleServerData
+		GetLobbyInfoResult
+		GetBattleServer
+		GetBattleServerResult
+		JoinBattleQueue
+		JoinBattleQueueResult
+		LeaveBattleQueue
+		MatchBattle
+		CreateBattlePlayer
+		CreateBattle
+		CreateBattleRep
+		JoinBattle
+		AttachBattle
+		DetachBattle
+		RecoverBattle
+		RecoverBattleRep
 */
 package msgs
 
@@ -126,34 +144,6 @@ var BagMsgType_value = map[string]int32{
 
 func (BagMsgType) EnumDescriptor() ([]byte, []int) { return fileDescriptorProtos, []int{1} }
 
-// =========chat=============
-type ChatMsgType int32
-
-const (
-	C2S_PrivateChat      ChatMsgType = 0
-	S2C_PrivateChat      ChatMsgType = 1
-	S2C_PrivateOtherChat ChatMsgType = 2
-	C2S_WorldChat        ChatMsgType = 3
-	S2C_WorldChat        ChatMsgType = 4
-)
-
-var ChatMsgType_name = map[int32]string{
-	0: "C2S_PrivateChat",
-	1: "S2C_PrivateChat",
-	2: "S2C_PrivateOtherChat",
-	3: "C2S_WorldChat",
-	4: "S2C_WorldChat",
-}
-var ChatMsgType_value = map[string]int32{
-	"C2S_PrivateChat":      0,
-	"S2C_PrivateChat":      1,
-	"S2C_PrivateOtherChat": 2,
-	"C2S_WorldChat":        3,
-	"S2C_WorldChat":        4,
-}
-
-func (ChatMsgType) EnumDescriptor() ([]byte, []int) { return fileDescriptorProtos, []int{2} }
-
 // 服务器状态
 type ServiceState int32
 
@@ -174,7 +164,7 @@ var ServiceState_value = map[string]int32{
 	"ServiceStop":      2,
 }
 
-func (ServiceState) EnumDescriptor() ([]byte, []int) { return fileDescriptorProtos, []int{3} }
+func (ServiceState) EnumDescriptor() ([]byte, []int) { return fileDescriptorProtos, []int{2} }
 
 // ==========Login===========
 // 登入游戏验证
@@ -246,131 +236,17 @@ func (m *S2C_ShopBuyMsg) GetResult() GAErrorCode {
 	return OK
 }
 
-type C2S_PrivateChatMsg struct {
-	TargetName string `protobuf:"bytes,1,opt,name=targetName,proto3" json:"targetName,omitempty"`
-	Msg        string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-}
-
-func (m *C2S_PrivateChatMsg) Reset()                    { *m = C2S_PrivateChatMsg{} }
-func (*C2S_PrivateChatMsg) ProtoMessage()               {}
-func (*C2S_PrivateChatMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{4} }
-
-func (m *C2S_PrivateChatMsg) GetTargetName() string {
-	if m != nil {
-		return m.TargetName
-	}
-	return ""
-}
-
-func (m *C2S_PrivateChatMsg) GetMsg() string {
-	if m != nil {
-		return m.Msg
-	}
-	return ""
-}
-
-type S2C_PrivateChatMsg struct {
-	TargetName string      `protobuf:"bytes,1,opt,name=targetName,proto3" json:"targetName,omitempty"`
-	Msg        string      `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	Result     GAErrorCode `protobuf:"varint,3,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
-}
-
-func (m *S2C_PrivateChatMsg) Reset()                    { *m = S2C_PrivateChatMsg{} }
-func (*S2C_PrivateChatMsg) ProtoMessage()               {}
-func (*S2C_PrivateChatMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{5} }
-
-func (m *S2C_PrivateChatMsg) GetTargetName() string {
-	if m != nil {
-		return m.TargetName
-	}
-	return ""
-}
-
-func (m *S2C_PrivateChatMsg) GetMsg() string {
-	if m != nil {
-		return m.Msg
-	}
-	return ""
-}
-
-func (m *S2C_PrivateChatMsg) GetResult() GAErrorCode {
-	if m != nil {
-		return m.Result
-	}
-	return OK
-}
-
-type S2C_PrivateOtherChatMsg struct {
-	SendName string `protobuf:"bytes,1,opt,name=sendName,proto3" json:"sendName,omitempty"`
-	Msg      string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-}
-
-func (m *S2C_PrivateOtherChatMsg) Reset()                    { *m = S2C_PrivateOtherChatMsg{} }
-func (*S2C_PrivateOtherChatMsg) ProtoMessage()               {}
-func (*S2C_PrivateOtherChatMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{6} }
-
-func (m *S2C_PrivateOtherChatMsg) GetSendName() string {
-	if m != nil {
-		return m.SendName
-	}
-	return ""
-}
-
-func (m *S2C_PrivateOtherChatMsg) GetMsg() string {
-	if m != nil {
-		return m.Msg
-	}
-	return ""
-}
-
-type C2S_WorldChatMsg struct {
-	Msg string `protobuf:"bytes,1,opt,name=msg,proto3" json:"msg,omitempty"`
-}
-
-func (m *C2S_WorldChatMsg) Reset()                    { *m = C2S_WorldChatMsg{} }
-func (*C2S_WorldChatMsg) ProtoMessage()               {}
-func (*C2S_WorldChatMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{7} }
-
-func (m *C2S_WorldChatMsg) GetMsg() string {
-	if m != nil {
-		return m.Msg
-	}
-	return ""
-}
-
-type S2C_WorldChatMsg struct {
-	SendName string `protobuf:"bytes,1,opt,name=sendName,proto3" json:"sendName,omitempty"`
-	Msg      string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-}
-
-func (m *S2C_WorldChatMsg) Reset()                    { *m = S2C_WorldChatMsg{} }
-func (*S2C_WorldChatMsg) ProtoMessage()               {}
-func (*S2C_WorldChatMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{8} }
-
-func (m *S2C_WorldChatMsg) GetSendName() string {
-	if m != nil {
-		return m.SendName
-	}
-	return ""
-}
-
-func (m *S2C_WorldChatMsg) GetMsg() string {
-	if m != nil {
-		return m.Msg
-	}
-	return ""
-}
-
 // 客户端消息转rpc通用消息
 type FrameMsg struct {
 	Channel ChannelType `protobuf:"varint,1,opt,name=channel,proto3,enum=msgs.ChannelType" json:"channel,omitempty"`
 	MsgId   uint32      `protobuf:"varint,2,opt,name=msgId,proto3" json:"msgId,omitempty"`
 	RawData []byte      `protobuf:"bytes,3,opt,name=rawData,proto3" json:"rawData,omitempty"`
+	Uid     uint64      `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`
 }
 
 func (m *FrameMsg) Reset()                    { *m = FrameMsg{} }
 func (*FrameMsg) ProtoMessage()               {}
-func (*FrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{9} }
+func (*FrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{4} }
 
 func (m *FrameMsg) GetChannel() ChannelType {
 	if m != nil {
@@ -393,6 +269,52 @@ func (m *FrameMsg) GetRawData() []byte {
 	return nil
 }
 
+func (m *FrameMsg) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+type FrameMsgJson struct {
+	Channel ChannelType `protobuf:"varint,1,opt,name=channel,proto3,enum=msgs.ChannelType" json:"channel,omitempty"`
+	MsgId   string      `protobuf:"bytes,2,opt,name=msgId,proto3" json:"msgId,omitempty"`
+	RawData []byte      `protobuf:"bytes,3,opt,name=rawData,proto3" json:"rawData,omitempty"`
+	Uid     uint64      `protobuf:"varint,4,opt,name=uid,proto3" json:"uid,omitempty"`
+}
+
+func (m *FrameMsgJson) Reset()                    { *m = FrameMsgJson{} }
+func (*FrameMsgJson) ProtoMessage()               {}
+func (*FrameMsgJson) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{5} }
+
+func (m *FrameMsgJson) GetChannel() ChannelType {
+	if m != nil {
+		return m.Channel
+	}
+	return Login
+}
+
+func (m *FrameMsgJson) GetMsgId() string {
+	if m != nil {
+		return m.MsgId
+	}
+	return ""
+}
+
+func (m *FrameMsgJson) GetRawData() []byte {
+	if m != nil {
+		return m.RawData
+	}
+	return nil
+}
+
+func (m *FrameMsgJson) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
 type FrameMsgReq struct {
 	Frame *FrameMsg `protobuf:"bytes,1,opt,name=frame" json:"frame,omitempty"`
 	Cno   uint32    `protobuf:"varint,2,opt,name=cno,proto3" json:"cno,omitempty"`
@@ -400,7 +322,7 @@ type FrameMsgReq struct {
 
 func (m *FrameMsgReq) Reset()                    { *m = FrameMsgReq{} }
 func (*FrameMsgReq) ProtoMessage()               {}
-func (*FrameMsgReq) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{10} }
+func (*FrameMsgReq) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{6} }
 
 func (m *FrameMsgReq) GetFrame() *FrameMsg {
 	if m != nil {
@@ -424,7 +346,7 @@ type FrameMsgRep struct {
 
 func (m *FrameMsgRep) Reset()                    { *m = FrameMsgRep{} }
 func (*FrameMsgRep) ProtoMessage()               {}
-func (*FrameMsgRep) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{11} }
+func (*FrameMsgRep) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{7} }
 
 func (m *FrameMsgRep) GetErrCode() GAErrorCode {
 	if m != nil {
@@ -442,7 +364,7 @@ type UnicastFrameMsg struct {
 
 func (m *UnicastFrameMsg) Reset()                    { *m = UnicastFrameMsg{} }
 func (*UnicastFrameMsg) ProtoMessage()               {}
-func (*UnicastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{12} }
+func (*UnicastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{8} }
 
 func (m *UnicastFrameMsg) GetFrameMsg() *FrameMsg {
 	if m != nil {
@@ -466,7 +388,7 @@ type MulticastFrameMsg struct {
 
 func (m *MulticastFrameMsg) Reset()                    { *m = MulticastFrameMsg{} }
 func (*MulticastFrameMsg) ProtoMessage()               {}
-func (*MulticastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{13} }
+func (*MulticastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{9} }
 
 func (m *MulticastFrameMsg) GetFrameMsg() *FrameMsg {
 	if m != nil {
@@ -489,9 +411,24 @@ type BroadcastFrameMsg struct {
 
 func (m *BroadcastFrameMsg) Reset()                    { *m = BroadcastFrameMsg{} }
 func (*BroadcastFrameMsg) ProtoMessage()               {}
-func (*BroadcastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{14} }
+func (*BroadcastFrameMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{10} }
 
 func (m *BroadcastFrameMsg) GetFrameMsg() *FrameMsg {
+	if m != nil {
+		return m.FrameMsg
+	}
+	return nil
+}
+
+type BroadcastFrameMsgJson struct {
+	FrameMsg *FrameMsgJson `protobuf:"bytes,1,opt,name=frameMsg" json:"frameMsg,omitempty"`
+}
+
+func (m *BroadcastFrameMsgJson) Reset()                    { *m = BroadcastFrameMsgJson{} }
+func (*BroadcastFrameMsgJson) ProtoMessage()               {}
+func (*BroadcastFrameMsgJson) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{11} }
+
+func (m *BroadcastFrameMsgJson) GetFrameMsg() *FrameMsgJson {
 	if m != nil {
 		return m.FrameMsg
 	}
@@ -506,7 +443,7 @@ type AddAgentToParent struct {
 
 func (m *AddAgentToParent) Reset()                    { *m = AddAgentToParent{} }
 func (*AddAgentToParent) ProtoMessage()               {}
-func (*AddAgentToParent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{15} }
+func (*AddAgentToParent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{12} }
 
 func (m *AddAgentToParent) GetUid() uint64 {
 	if m != nil {
@@ -529,7 +466,7 @@ type RemoveAgentFromParent struct {
 
 func (m *RemoveAgentFromParent) Reset()                    { *m = RemoveAgentFromParent{} }
 func (*RemoveAgentFromParent) ProtoMessage()               {}
-func (*RemoveAgentFromParent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{16} }
+func (*RemoveAgentFromParent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{13} }
 
 func (m *RemoveAgentFromParent) GetUid() uint64 {
 	if m != nil {
@@ -543,7 +480,7 @@ type NewChild struct {
 
 func (m *NewChild) Reset()                    { *m = NewChild{} }
 func (*NewChild) ProtoMessage()               {}
-func (*NewChild) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{17} }
+func (*NewChild) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{14} }
 
 type NewChildResult struct {
 	Pid *actor.PID `protobuf:"bytes,1,opt,name=pid" json:"pid,omitempty"`
@@ -551,7 +488,7 @@ type NewChildResult struct {
 
 func (m *NewChildResult) Reset()                    { *m = NewChildResult{} }
 func (*NewChildResult) ProtoMessage()               {}
-func (*NewChildResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{18} }
+func (*NewChildResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{15} }
 
 func (m *NewChildResult) GetPid() *actor.PID {
 	if m != nil {
@@ -566,7 +503,7 @@ type Connect struct {
 
 func (m *Connect) Reset()                    { *m = Connect{} }
 func (*Connect) ProtoMessage()               {}
-func (*Connect) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{19} }
+func (*Connect) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{16} }
 
 func (m *Connect) GetSender() *actor.PID {
 	if m != nil {
@@ -581,7 +518,7 @@ type Connected struct {
 
 func (m *Connected) Reset()                    { *m = Connected{} }
 func (*Connected) ProtoMessage()               {}
-func (*Connected) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{20} }
+func (*Connected) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{17} }
 
 func (m *Connected) GetMessage() string {
 	if m != nil {
@@ -595,7 +532,7 @@ type SpawnAgent struct {
 
 func (m *SpawnAgent) Reset()                    { *m = SpawnAgent{} }
 func (*SpawnAgent) ProtoMessage()               {}
-func (*SpawnAgent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{21} }
+func (*SpawnAgent) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{18} }
 
 type ServiceValue struct {
 	Key   string `protobuf:"bytes,1,opt,name=Key,json=key,proto3" json:"Key,omitempty"`
@@ -604,7 +541,7 @@ type ServiceValue struct {
 
 func (m *ServiceValue) Reset()                    { *m = ServiceValue{} }
 func (*ServiceValue) ProtoMessage()               {}
-func (*ServiceValue) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{22} }
+func (*ServiceValue) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{19} }
 
 func (m *ServiceValue) GetKey() string {
 	if m != nil {
@@ -630,7 +567,7 @@ type AddService struct {
 
 func (m *AddService) Reset()                    { *m = AddService{} }
 func (*AddService) ProtoMessage()               {}
-func (*AddService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{23} }
+func (*AddService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{20} }
 
 func (m *AddService) GetServiceName() string {
 	if m != nil {
@@ -660,13 +597,28 @@ func (m *AddService) GetValues() []*ServiceValue {
 	return nil
 }
 
+type AddServiceRep struct {
+	Result GAErrorCode `protobuf:"varint,1,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+}
+
+func (m *AddServiceRep) Reset()                    { *m = AddServiceRep{} }
+func (*AddServiceRep) ProtoMessage()               {}
+func (*AddServiceRep) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{21} }
+
+func (m *AddServiceRep) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
+
 // 发送成功的通用返回
 type SendOK struct {
 }
 
 func (m *SendOK) Reset()                    { *m = SendOK{} }
 func (*SendOK) ProtoMessage()               {}
-func (*SendOK) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{24} }
+func (*SendOK) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{22} }
 
 // 解注册服务器
 type RemoveService struct {
@@ -676,7 +628,7 @@ type RemoveService struct {
 
 func (m *RemoveService) Reset()                    { *m = RemoveService{} }
 func (*RemoveService) ProtoMessage()               {}
-func (*RemoveService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{25} }
+func (*RemoveService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{23} }
 
 func (m *RemoveService) GetServiceName() string {
 	if m != nil {
@@ -699,7 +651,7 @@ type ApplyService struct {
 
 func (m *ApplyService) Reset()                    { *m = ApplyService{} }
 func (*ApplyService) ProtoMessage()               {}
-func (*ApplyService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{26} }
+func (*ApplyService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{24} }
 
 func (m *ApplyService) GetServiceType() string {
 	if m != nil {
@@ -719,7 +671,7 @@ type ApplyServiceResult struct {
 
 func (m *ApplyServiceResult) Reset()                    { *m = ApplyServiceResult{} }
 func (*ApplyServiceResult) ProtoMessage()               {}
-func (*ApplyServiceResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{27} }
+func (*ApplyServiceResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{25} }
 
 func (m *ApplyServiceResult) GetServiceType() string {
 	if m != nil {
@@ -763,7 +715,7 @@ type GetTypeServices struct {
 
 func (m *GetTypeServices) Reset()                    { *m = GetTypeServices{} }
 func (*GetTypeServices) ProtoMessage()               {}
-func (*GetTypeServices) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{28} }
+func (*GetTypeServices) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{26} }
 
 func (m *GetTypeServices) GetServiceType() string {
 	if m != nil {
@@ -778,7 +730,7 @@ type GetTypeServicesResult struct {
 
 func (m *GetTypeServicesResult) Reset()                    { *m = GetTypeServicesResult{} }
 func (*GetTypeServicesResult) ProtoMessage()               {}
-func (*GetTypeServicesResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{29} }
+func (*GetTypeServicesResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{27} }
 
 func (m *GetTypeServicesResult) GetPids() []*actor.PID {
 	if m != nil {
@@ -796,7 +748,7 @@ type UploadService struct {
 
 func (m *UploadService) Reset()                    { *m = UploadService{} }
 func (*UploadService) ProtoMessage()               {}
-func (*UploadService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{30} }
+func (*UploadService) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{28} }
 
 func (m *UploadService) GetServiceName() string {
 	if m != nil {
@@ -827,7 +779,7 @@ type UserLogin struct {
 
 func (m *UserLogin) Reset()                    { *m = UserLogin{} }
 func (*UserLogin) ProtoMessage()               {}
-func (*UserLogin) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{31} }
+func (*UserLogin) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{29} }
 
 func (m *UserLogin) GetAccount() string {
 	if m != nil {
@@ -850,7 +802,7 @@ type GetSessionInfo struct {
 
 func (m *GetSessionInfo) Reset()                    { *m = GetSessionInfo{} }
 func (*GetSessionInfo) ProtoMessage()               {}
-func (*GetSessionInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{32} }
+func (*GetSessionInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{30} }
 
 func (m *GetSessionInfo) GetUid() uint64 {
 	if m != nil {
@@ -865,7 +817,7 @@ type GetSessionInfoByName struct {
 
 func (m *GetSessionInfoByName) Reset()                    { *m = GetSessionInfoByName{} }
 func (*GetSessionInfoByName) ProtoMessage()               {}
-func (*GetSessionInfoByName) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{33} }
+func (*GetSessionInfoByName) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{31} }
 
 func (m *GetSessionInfoByName) GetName() string {
 	if m != nil {
@@ -882,7 +834,7 @@ type GetSessionInfoResult struct {
 
 func (m *GetSessionInfoResult) Reset()                    { *m = GetSessionInfoResult{} }
 func (*GetSessionInfoResult) ProtoMessage()               {}
-func (*GetSessionInfoResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{34} }
+func (*GetSessionInfoResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{32} }
 
 func (m *GetSessionInfoResult) GetUserInfo() *UserBaseInfo {
 	if m != nil {
@@ -911,7 +863,7 @@ type ClientDisconnect struct {
 
 func (m *ClientDisconnect) Reset()                    { *m = ClientDisconnect{} }
 func (*ClientDisconnect) ProtoMessage()               {}
-func (*ClientDisconnect) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{35} }
+func (*ClientDisconnect) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{33} }
 
 // gate收到消息
 type ReceviceClientMsg struct {
@@ -920,7 +872,7 @@ type ReceviceClientMsg struct {
 
 func (m *ReceviceClientMsg) Reset()                    { *m = ReceviceClientMsg{} }
 func (*ReceviceClientMsg) ProtoMessage()               {}
-func (*ReceviceClientMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{36} }
+func (*ReceviceClientMsg) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{34} }
 
 func (m *ReceviceClientMsg) GetRawdata() []byte {
 	if m != nil {
@@ -938,7 +890,7 @@ type UserLeave struct {
 
 func (m *UserLeave) Reset()                    { *m = UserLeave{} }
 func (*UserLeave) ProtoMessage()               {}
-func (*UserLeave) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{37} }
+func (*UserLeave) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{35} }
 
 func (m *UserLeave) GetUid() uint64 {
 	if m != nil {
@@ -969,7 +921,7 @@ type Kick struct {
 
 func (m *Kick) Reset()                    { *m = Kick{} }
 func (*Kick) ProtoMessage()               {}
-func (*Kick) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{38} }
+func (*Kick) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{36} }
 
 func (m *Kick) GetUid() uint64 {
 	if m != nil {
@@ -994,7 +946,7 @@ type ServerCheckLogin struct {
 
 func (m *ServerCheckLogin) Reset()                    { *m = ServerCheckLogin{} }
 func (*ServerCheckLogin) ProtoMessage()               {}
-func (*ServerCheckLogin) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{39} }
+func (*ServerCheckLogin) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{37} }
 
 func (m *ServerCheckLogin) GetUid() uint64 {
 	if m != nil {
@@ -1025,7 +977,7 @@ type UserBindServer struct {
 
 func (m *UserBindServer) Reset()                    { *m = UserBindServer{} }
 func (*UserBindServer) ProtoMessage()               {}
-func (*UserBindServer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{40} }
+func (*UserBindServer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{38} }
 
 func (m *UserBindServer) GetChannel() ChannelType {
 	if m != nil {
@@ -1053,7 +1005,7 @@ type UserBaseInfo struct {
 
 func (m *UserBaseInfo) Reset()                    { *m = UserBaseInfo{} }
 func (*UserBaseInfo) ProtoMessage()               {}
-func (*UserBaseInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{41} }
+func (*UserBaseInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{39} }
 
 func (m *UserBaseInfo) GetAccount() string {
 	if m != nil {
@@ -1106,7 +1058,7 @@ type CheckLoginResult struct {
 
 func (m *CheckLoginResult) Reset()                    { *m = CheckLoginResult{} }
 func (*CheckLoginResult) ProtoMessage()               {}
-func (*CheckLoginResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{42} }
+func (*CheckLoginResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{40} }
 
 func (m *CheckLoginResult) GetResult() GAErrorCode {
 	if m != nil {
@@ -1140,7 +1092,7 @@ type CreatePlayer struct {
 
 func (m *CreatePlayer) Reset()                    { *m = CreatePlayer{} }
 func (*CreatePlayer) ProtoMessage()               {}
-func (*CreatePlayer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{43} }
+func (*CreatePlayer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{41} }
 
 func (m *CreatePlayer) GetUid() uint64 {
 	if m != nil {
@@ -1182,11 +1134,12 @@ type CreatePlayerResult struct {
 	BaseInfo  *UserBaseInfo `protobuf:"bytes,2,opt,name=baseInfo" json:"baseInfo,omitempty"`
 	PlayerPID *actor.PID    `protobuf:"bytes,3,opt,name=playerPID" json:"playerPID,omitempty"`
 	TransData *CreatePlayer `protobuf:"bytes,4,opt,name=transData" json:"transData,omitempty"`
+	RoomPID   *actor.PID    `protobuf:"bytes,5,opt,name=roomPID" json:"roomPID,omitempty"`
 }
 
 func (m *CreatePlayerResult) Reset()                    { *m = CreatePlayerResult{} }
 func (*CreatePlayerResult) ProtoMessage()               {}
-func (*CreatePlayerResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{44} }
+func (*CreatePlayerResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{42} }
 
 func (m *CreatePlayerResult) GetResult() GAErrorCode {
 	if m != nil {
@@ -1216,6 +1169,13 @@ func (m *CreatePlayerResult) GetTransData() *CreatePlayer {
 	return nil
 }
 
+func (m *CreatePlayerResult) GetRoomPID() *actor.PID {
+	if m != nil {
+		return m.RoomPID
+	}
+	return nil
+}
+
 // 掉线
 type PlayerOutline struct {
 	Reason string `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
@@ -1223,7 +1183,7 @@ type PlayerOutline struct {
 
 func (m *PlayerOutline) Reset()                    { *m = PlayerOutline{} }
 func (*PlayerOutline) ProtoMessage()               {}
-func (*PlayerOutline) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{45} }
+func (*PlayerOutline) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{43} }
 
 func (m *PlayerOutline) GetReason() string {
 	if m != nil {
@@ -1238,24 +1198,627 @@ type Tick struct {
 
 func (m *Tick) Reset()                    { *m = Tick{} }
 func (*Tick) ProtoMessage()               {}
-func (*Tick) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{46} }
+func (*Tick) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{44} }
+
+// 定时刷新
+type TimeFlush struct {
+}
+
+func (m *TimeFlush) Reset()                    { *m = TimeFlush{} }
+func (*TimeFlush) ProtoMessage()               {}
+func (*TimeFlush) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{45} }
+
+type BattleRoomInfo struct {
+	Uid   uint64   `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Rtype int32    `protobuf:"varint,2,opt,name=rtype,proto3" json:"rtype,omitempty"`
+	Boss  int32    `protobuf:"varint,3,opt,name=boss,proto3" json:"boss,omitempty"`
+	Key   string   `protobuf:"bytes,4,opt,name=key,proto3" json:"key,omitempty"`
+	Hero  int32    `protobuf:"varint,5,opt,name=hero,proto3" json:"hero,omitempty"`
+	Card  []string `protobuf:"bytes,6,rep,name=card" json:"card,omitempty"`
+	Equip []int32  `protobuf:"varint,7,rep,packed,name=equip" json:"equip,omitempty"`
+	Name  string   `protobuf:"bytes,8,opt,name=name,proto3" json:"name,omitempty"`
+	Lv    int32    `protobuf:"varint,9,opt,name=lv,proto3" json:"lv,omitempty"`
+	Ai    int32    `protobuf:"varint,10,opt,name=ai,proto3" json:"ai,omitempty"`
+}
+
+func (m *BattleRoomInfo) Reset()                    { *m = BattleRoomInfo{} }
+func (*BattleRoomInfo) ProtoMessage()               {}
+func (*BattleRoomInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{46} }
+
+func (m *BattleRoomInfo) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *BattleRoomInfo) GetRtype() int32 {
+	if m != nil {
+		return m.Rtype
+	}
+	return 0
+}
+
+func (m *BattleRoomInfo) GetBoss() int32 {
+	if m != nil {
+		return m.Boss
+	}
+	return 0
+}
+
+func (m *BattleRoomInfo) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *BattleRoomInfo) GetHero() int32 {
+	if m != nil {
+		return m.Hero
+	}
+	return 0
+}
+
+func (m *BattleRoomInfo) GetCard() []string {
+	if m != nil {
+		return m.Card
+	}
+	return nil
+}
+
+func (m *BattleRoomInfo) GetEquip() []int32 {
+	if m != nil {
+		return m.Equip
+	}
+	return nil
+}
+
+func (m *BattleRoomInfo) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *BattleRoomInfo) GetLv() int32 {
+	if m != nil {
+		return m.Lv
+	}
+	return 0
+}
+
+func (m *BattleRoomInfo) GetAi() int32 {
+	if m != nil {
+		return m.Ai
+	}
+	return 0
+}
+
+type GetLobbyInfo struct {
+}
+
+func (m *GetLobbyInfo) Reset()                    { *m = GetLobbyInfo{} }
+func (*GetLobbyInfo) ProtoMessage()               {}
+func (*GetLobbyInfo) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{47} }
+
+type LobbyQueueData struct {
+	Type int32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
+	Num  int32 `protobuf:"varint,2,opt,name=num,proto3" json:"num,omitempty"`
+}
+
+func (m *LobbyQueueData) Reset()                    { *m = LobbyQueueData{} }
+func (*LobbyQueueData) ProtoMessage()               {}
+func (*LobbyQueueData) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{48} }
+
+func (m *LobbyQueueData) GetType() int32 {
+	if m != nil {
+		return m.Type
+	}
+	return 0
+}
+
+func (m *LobbyQueueData) GetNum() int32 {
+	if m != nil {
+		return m.Num
+	}
+	return 0
+}
+
+type BattleServerData struct {
+	Addr  string `protobuf:"bytes,1,opt,name=addr,proto3" json:"addr,omitempty"`
+	Num   int32  `protobuf:"varint,2,opt,name=num,proto3" json:"num,omitempty"`
+	State int32  `protobuf:"varint,3,opt,name=state,proto3" json:"state,omitempty"`
+}
+
+func (m *BattleServerData) Reset()                    { *m = BattleServerData{} }
+func (*BattleServerData) ProtoMessage()               {}
+func (*BattleServerData) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{49} }
+
+func (m *BattleServerData) GetAddr() string {
+	if m != nil {
+		return m.Addr
+	}
+	return ""
+}
+
+func (m *BattleServerData) GetNum() int32 {
+	if m != nil {
+		return m.Num
+	}
+	return 0
+}
+
+func (m *BattleServerData) GetState() int32 {
+	if m != nil {
+		return m.State
+	}
+	return 0
+}
+
+type GetLobbyInfoResult struct {
+	Queuedata        []*LobbyQueueData   `protobuf:"bytes,1,rep,name=queuedata" json:"queuedata,omitempty"`
+	BattleServerData []*BattleServerData `protobuf:"bytes,2,rep,name=battleServerData" json:"battleServerData,omitempty"`
+}
+
+func (m *GetLobbyInfoResult) Reset()                    { *m = GetLobbyInfoResult{} }
+func (*GetLobbyInfoResult) ProtoMessage()               {}
+func (*GetLobbyInfoResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{50} }
+
+func (m *GetLobbyInfoResult) GetQueuedata() []*LobbyQueueData {
+	if m != nil {
+		return m.Queuedata
+	}
+	return nil
+}
+
+func (m *GetLobbyInfoResult) GetBattleServerData() []*BattleServerData {
+	if m != nil {
+		return m.BattleServerData
+	}
+	return nil
+}
+
+type GetBattleServer struct {
+	Uid   uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Rtype int32  `protobuf:"varint,2,opt,name=rtype,proto3" json:"rtype,omitempty"`
+	Boss  int32  `protobuf:"varint,3,opt,name=boss,proto3" json:"boss,omitempty"`
+	// bytes roomInfo = 4;
+	Oppuid  uint64     `protobuf:"varint,4,opt,name=oppuid,proto3" json:"oppuid,omitempty"`
+	SelfPID *actor.PID `protobuf:"bytes,5,opt,name=selfPID" json:"selfPID,omitempty"`
+}
+
+func (m *GetBattleServer) Reset()                    { *m = GetBattleServer{} }
+func (*GetBattleServer) ProtoMessage()               {}
+func (*GetBattleServer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{51} }
+
+func (m *GetBattleServer) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *GetBattleServer) GetRtype() int32 {
+	if m != nil {
+		return m.Rtype
+	}
+	return 0
+}
+
+func (m *GetBattleServer) GetBoss() int32 {
+	if m != nil {
+		return m.Boss
+	}
+	return 0
+}
+
+func (m *GetBattleServer) GetOppuid() uint64 {
+	if m != nil {
+		return m.Oppuid
+	}
+	return 0
+}
+
+func (m *GetBattleServer) GetSelfPID() *actor.PID {
+	if m != nil {
+		return m.SelfPID
+	}
+	return nil
+}
+
+type GetBattleServerResult struct {
+	BattlePID *actor.PID  `protobuf:"bytes,1,opt,name=battlePID" json:"battlePID,omitempty"`
+	RoomId    string      `protobuf:"bytes,2,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Result    GAErrorCode `protobuf:"varint,3,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+}
+
+func (m *GetBattleServerResult) Reset()                    { *m = GetBattleServerResult{} }
+func (*GetBattleServerResult) ProtoMessage()               {}
+func (*GetBattleServerResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{52} }
+
+func (m *GetBattleServerResult) GetBattlePID() *actor.PID {
+	if m != nil {
+		return m.BattlePID
+	}
+	return nil
+}
+
+func (m *GetBattleServerResult) GetRoomId() string {
+	if m != nil {
+		return m.RoomId
+	}
+	return ""
+}
+
+func (m *GetBattleServerResult) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
+
+type JoinBattleQueue struct {
+	Uid      uint64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Rtype    int32      `protobuf:"varint,2,opt,name=rtype,proto3" json:"rtype,omitempty"`
+	RoomInfo []byte     `protobuf:"bytes,3,opt,name=roomInfo,proto3" json:"roomInfo,omitempty"`
+	Sender   *actor.PID `protobuf:"bytes,4,opt,name=sender" json:"sender,omitempty"`
+	AiNum    int32      `protobuf:"varint,5,opt,name=aiNum,proto3" json:"aiNum,omitempty"`
+}
+
+func (m *JoinBattleQueue) Reset()                    { *m = JoinBattleQueue{} }
+func (*JoinBattleQueue) ProtoMessage()               {}
+func (*JoinBattleQueue) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{53} }
+
+func (m *JoinBattleQueue) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *JoinBattleQueue) GetRtype() int32 {
+	if m != nil {
+		return m.Rtype
+	}
+	return 0
+}
+
+func (m *JoinBattleQueue) GetRoomInfo() []byte {
+	if m != nil {
+		return m.RoomInfo
+	}
+	return nil
+}
+
+func (m *JoinBattleQueue) GetSender() *actor.PID {
+	if m != nil {
+		return m.Sender
+	}
+	return nil
+}
+
+func (m *JoinBattleQueue) GetAiNum() int32 {
+	if m != nil {
+		return m.AiNum
+	}
+	return 0
+}
+
+type JoinBattleQueueResult struct {
+	Waittime uint64      `protobuf:"varint,1,opt,name=waittime,proto3" json:"waittime,omitempty"`
+	Result   GAErrorCode `protobuf:"varint,2,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+}
+
+func (m *JoinBattleQueueResult) Reset()                    { *m = JoinBattleQueueResult{} }
+func (*JoinBattleQueueResult) ProtoMessage()               {}
+func (*JoinBattleQueueResult) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{54} }
+
+func (m *JoinBattleQueueResult) GetWaittime() uint64 {
+	if m != nil {
+		return m.Waittime
+	}
+	return 0
+}
+
+func (m *JoinBattleQueueResult) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
+
+type LeaveBattleQueue struct {
+	Uid uint64 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+}
+
+func (m *LeaveBattleQueue) Reset()                    { *m = LeaveBattleQueue{} }
+func (*LeaveBattleQueue) ProtoMessage()               {}
+func (*LeaveBattleQueue) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{55} }
+
+func (m *LeaveBattleQueue) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+type MatchBattle struct {
+	BattleAddr string      `protobuf:"bytes,1,opt,name=battleAddr,proto3" json:"battleAddr,omitempty"`
+	RoomId     string      `protobuf:"bytes,2,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Uid        uint64      `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`
+	Rtype      int32       `protobuf:"varint,4,opt,name=rtype,proto3" json:"rtype,omitempty"`
+	RoomInfo   []byte      `protobuf:"bytes,5,opt,name=roomInfo,proto3" json:"roomInfo,omitempty"`
+	Result     GAErrorCode `protobuf:"varint,6,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+	RoomPID    *actor.PID  `protobuf:"bytes,7,opt,name=roomPID" json:"roomPID,omitempty"`
+}
+
+func (m *MatchBattle) Reset()                    { *m = MatchBattle{} }
+func (*MatchBattle) ProtoMessage()               {}
+func (*MatchBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{56} }
+
+func (m *MatchBattle) GetBattleAddr() string {
+	if m != nil {
+		return m.BattleAddr
+	}
+	return ""
+}
+
+func (m *MatchBattle) GetRoomId() string {
+	if m != nil {
+		return m.RoomId
+	}
+	return ""
+}
+
+func (m *MatchBattle) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *MatchBattle) GetRtype() int32 {
+	if m != nil {
+		return m.Rtype
+	}
+	return 0
+}
+
+func (m *MatchBattle) GetRoomInfo() []byte {
+	if m != nil {
+		return m.RoomInfo
+	}
+	return nil
+}
+
+func (m *MatchBattle) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
+
+func (m *MatchBattle) GetRoomPID() *actor.PID {
+	if m != nil {
+		return m.RoomPID
+	}
+	return nil
+}
+
+type CreateBattlePlayer struct {
+	Uid       uint64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Name      string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Skin      int32      `protobuf:"varint,3,opt,name=skin,proto3" json:"skin,omitempty"`
+	AgentPID  *actor.PID `protobuf:"bytes,4,opt,name=agentPID" json:"agentPID,omitempty"`
+	PlayerPID *actor.PID `protobuf:"bytes,5,opt,name=playerPID" json:"playerPID,omitempty"`
+}
+
+func (m *CreateBattlePlayer) Reset()                    { *m = CreateBattlePlayer{} }
+func (*CreateBattlePlayer) ProtoMessage()               {}
+func (*CreateBattlePlayer) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{57} }
+
+func (m *CreateBattlePlayer) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *CreateBattlePlayer) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *CreateBattlePlayer) GetSkin() int32 {
+	if m != nil {
+		return m.Skin
+	}
+	return 0
+}
+
+func (m *CreateBattlePlayer) GetAgentPID() *actor.PID {
+	if m != nil {
+		return m.AgentPID
+	}
+	return nil
+}
+
+func (m *CreateBattlePlayer) GetPlayerPID() *actor.PID {
+	if m != nil {
+		return m.PlayerPID
+	}
+	return nil
+}
+
+type CreateBattle struct {
+	RoomId  string                `protobuf:"bytes,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	StageId int32                 `protobuf:"varint,2,opt,name=stageId,proto3" json:"stageId,omitempty"`
+	Rtype   int32                 `protobuf:"varint,3,opt,name=rtype,proto3" json:"rtype,omitempty"`
+	Players []*CreateBattlePlayer `protobuf:"bytes,4,rep,name=players" json:"players,omitempty"`
+}
+
+func (m *CreateBattle) Reset()                    { *m = CreateBattle{} }
+func (*CreateBattle) ProtoMessage()               {}
+func (*CreateBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{58} }
+
+func (m *CreateBattle) GetRoomId() string {
+	if m != nil {
+		return m.RoomId
+	}
+	return ""
+}
+
+func (m *CreateBattle) GetStageId() int32 {
+	if m != nil {
+		return m.StageId
+	}
+	return 0
+}
+
+func (m *CreateBattle) GetRtype() int32 {
+	if m != nil {
+		return m.Rtype
+	}
+	return 0
+}
+
+func (m *CreateBattle) GetPlayers() []*CreateBattlePlayer {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
+type CreateBattleRep struct {
+	RoomPID *actor.PID  `protobuf:"bytes,1,opt,name=roomPID" json:"roomPID,omitempty"`
+	Result  GAErrorCode `protobuf:"varint,2,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+}
+
+func (m *CreateBattleRep) Reset()                    { *m = CreateBattleRep{} }
+func (*CreateBattleRep) ProtoMessage()               {}
+func (*CreateBattleRep) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{59} }
+
+func (m *CreateBattleRep) GetRoomPID() *actor.PID {
+	if m != nil {
+		return m.RoomPID
+	}
+	return nil
+}
+
+func (m *CreateBattleRep) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
+
+type JoinBattle struct {
+	RoomId string              `protobuf:"bytes,1,opt,name=roomId,proto3" json:"roomId,omitempty"`
+	Player *CreateBattlePlayer `protobuf:"bytes,2,opt,name=player" json:"player,omitempty"`
+}
+
+func (m *JoinBattle) Reset()                    { *m = JoinBattle{} }
+func (*JoinBattle) ProtoMessage()               {}
+func (*JoinBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{60} }
+
+func (m *JoinBattle) GetRoomId() string {
+	if m != nil {
+		return m.RoomId
+	}
+	return ""
+}
+
+func (m *JoinBattle) GetPlayer() *CreateBattlePlayer {
+	if m != nil {
+		return m.Player
+	}
+	return nil
+}
+
+type AttachBattle struct {
+	RoomPID *actor.PID `protobuf:"bytes,1,opt,name=roomPID" json:"roomPID,omitempty"`
+}
+
+func (m *AttachBattle) Reset()                    { *m = AttachBattle{} }
+func (*AttachBattle) ProtoMessage()               {}
+func (*AttachBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{61} }
+
+func (m *AttachBattle) GetRoomPID() *actor.PID {
+	if m != nil {
+		return m.RoomPID
+	}
+	return nil
+}
+
+type DetachBattle struct {
+}
+
+func (m *DetachBattle) Reset()                    { *m = DetachBattle{} }
+func (*DetachBattle) ProtoMessage()               {}
+func (*DetachBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{62} }
+
+type RecoverBattle struct {
+	Uid      uint64     `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	AgentPID *actor.PID `protobuf:"bytes,2,opt,name=agentPID" json:"agentPID,omitempty"`
+}
+
+func (m *RecoverBattle) Reset()                    { *m = RecoverBattle{} }
+func (*RecoverBattle) ProtoMessage()               {}
+func (*RecoverBattle) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{63} }
+
+func (m *RecoverBattle) GetUid() uint64 {
+	if m != nil {
+		return m.Uid
+	}
+	return 0
+}
+
+func (m *RecoverBattle) GetAgentPID() *actor.PID {
+	if m != nil {
+		return m.AgentPID
+	}
+	return nil
+}
+
+type RecoverBattleRep struct {
+	RoomPID *actor.PID  `protobuf:"bytes,1,opt,name=roomPID" json:"roomPID,omitempty"`
+	Result  GAErrorCode `protobuf:"varint,2,opt,name=result,proto3,enum=msgs.GAErrorCode" json:"result,omitempty"`
+}
+
+func (m *RecoverBattleRep) Reset()                    { *m = RecoverBattleRep{} }
+func (*RecoverBattleRep) ProtoMessage()               {}
+func (*RecoverBattleRep) Descriptor() ([]byte, []int) { return fileDescriptorProtos, []int{64} }
+
+func (m *RecoverBattleRep) GetRoomPID() *actor.PID {
+	if m != nil {
+		return m.RoomPID
+	}
+	return nil
+}
+
+func (m *RecoverBattleRep) GetResult() GAErrorCode {
+	if m != nil {
+		return m.Result
+	}
+	return OK
+}
 
 func init() {
 	proto.RegisterType((*CheckLogin)(nil), "msgs.CheckLogin")
 	proto.RegisterType((*HeartBeatMsg)(nil), "msgs.HeartBeatMsg")
 	proto.RegisterType((*C2S_ShopBuyMsg)(nil), "msgs.C2S_ShopBuyMsg")
 	proto.RegisterType((*S2C_ShopBuyMsg)(nil), "msgs.S2C_ShopBuyMsg")
-	proto.RegisterType((*C2S_PrivateChatMsg)(nil), "msgs.C2S_PrivateChatMsg")
-	proto.RegisterType((*S2C_PrivateChatMsg)(nil), "msgs.S2C_PrivateChatMsg")
-	proto.RegisterType((*S2C_PrivateOtherChatMsg)(nil), "msgs.S2C_PrivateOtherChatMsg")
-	proto.RegisterType((*C2S_WorldChatMsg)(nil), "msgs.C2S_WorldChatMsg")
-	proto.RegisterType((*S2C_WorldChatMsg)(nil), "msgs.S2C_WorldChatMsg")
 	proto.RegisterType((*FrameMsg)(nil), "msgs.FrameMsg")
+	proto.RegisterType((*FrameMsgJson)(nil), "msgs.FrameMsgJson")
 	proto.RegisterType((*FrameMsgReq)(nil), "msgs.FrameMsgReq")
 	proto.RegisterType((*FrameMsgRep)(nil), "msgs.FrameMsgRep")
 	proto.RegisterType((*UnicastFrameMsg)(nil), "msgs.UnicastFrameMsg")
 	proto.RegisterType((*MulticastFrameMsg)(nil), "msgs.MulticastFrameMsg")
 	proto.RegisterType((*BroadcastFrameMsg)(nil), "msgs.BroadcastFrameMsg")
+	proto.RegisterType((*BroadcastFrameMsgJson)(nil), "msgs.BroadcastFrameMsgJson")
 	proto.RegisterType((*AddAgentToParent)(nil), "msgs.AddAgentToParent")
 	proto.RegisterType((*RemoveAgentFromParent)(nil), "msgs.RemoveAgentFromParent")
 	proto.RegisterType((*NewChild)(nil), "msgs.NewChild")
@@ -1265,6 +1828,7 @@ func init() {
 	proto.RegisterType((*SpawnAgent)(nil), "msgs.SpawnAgent")
 	proto.RegisterType((*ServiceValue)(nil), "msgs.ServiceValue")
 	proto.RegisterType((*AddService)(nil), "msgs.AddService")
+	proto.RegisterType((*AddServiceRep)(nil), "msgs.AddServiceRep")
 	proto.RegisterType((*SendOK)(nil), "msgs.SendOK")
 	proto.RegisterType((*RemoveService)(nil), "msgs.RemoveService")
 	proto.RegisterType((*ApplyService)(nil), "msgs.ApplyService")
@@ -1288,9 +1852,28 @@ func init() {
 	proto.RegisterType((*CreatePlayerResult)(nil), "msgs.CreatePlayerResult")
 	proto.RegisterType((*PlayerOutline)(nil), "msgs.PlayerOutline")
 	proto.RegisterType((*Tick)(nil), "msgs.Tick")
+	proto.RegisterType((*TimeFlush)(nil), "msgs.TimeFlush")
+	proto.RegisterType((*BattleRoomInfo)(nil), "msgs.BattleRoomInfo")
+	proto.RegisterType((*GetLobbyInfo)(nil), "msgs.GetLobbyInfo")
+	proto.RegisterType((*LobbyQueueData)(nil), "msgs.LobbyQueueData")
+	proto.RegisterType((*BattleServerData)(nil), "msgs.BattleServerData")
+	proto.RegisterType((*GetLobbyInfoResult)(nil), "msgs.GetLobbyInfoResult")
+	proto.RegisterType((*GetBattleServer)(nil), "msgs.GetBattleServer")
+	proto.RegisterType((*GetBattleServerResult)(nil), "msgs.GetBattleServerResult")
+	proto.RegisterType((*JoinBattleQueue)(nil), "msgs.JoinBattleQueue")
+	proto.RegisterType((*JoinBattleQueueResult)(nil), "msgs.JoinBattleQueueResult")
+	proto.RegisterType((*LeaveBattleQueue)(nil), "msgs.LeaveBattleQueue")
+	proto.RegisterType((*MatchBattle)(nil), "msgs.MatchBattle")
+	proto.RegisterType((*CreateBattlePlayer)(nil), "msgs.CreateBattlePlayer")
+	proto.RegisterType((*CreateBattle)(nil), "msgs.CreateBattle")
+	proto.RegisterType((*CreateBattleRep)(nil), "msgs.CreateBattleRep")
+	proto.RegisterType((*JoinBattle)(nil), "msgs.JoinBattle")
+	proto.RegisterType((*AttachBattle)(nil), "msgs.AttachBattle")
+	proto.RegisterType((*DetachBattle)(nil), "msgs.DetachBattle")
+	proto.RegisterType((*RecoverBattle)(nil), "msgs.RecoverBattle")
+	proto.RegisterType((*RecoverBattleRep)(nil), "msgs.RecoverBattleRep")
 	proto.RegisterEnum("msgs.ShopMsgType", ShopMsgType_name, ShopMsgType_value)
 	proto.RegisterEnum("msgs.BagMsgType", BagMsgType_name, BagMsgType_value)
-	proto.RegisterEnum("msgs.ChatMsgType", ChatMsgType_name, ChatMsgType_value)
 	proto.RegisterEnum("msgs.ServiceState", ServiceState_name, ServiceState_value)
 }
 func (x ShopMsgType) String() string {
@@ -1302,13 +1885,6 @@ func (x ShopMsgType) String() string {
 }
 func (x BagMsgType) String() string {
 	s, ok := BagMsgType_name[int32(x)]
-	if ok {
-		return s
-	}
-	return strconv.Itoa(int(x))
-}
-func (x ChatMsgType) String() string {
-	s, ok := ChatMsgType_name[int32(x)]
 	if ok {
 		return s
 	}
@@ -1444,171 +2020,6 @@ func (this *S2C_ShopBuyMsg) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *C2S_PrivateChatMsg) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*C2S_PrivateChatMsg)
-	if !ok {
-		that2, ok := that.(C2S_PrivateChatMsg)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.TargetName != that1.TargetName {
-		return false
-	}
-	if this.Msg != that1.Msg {
-		return false
-	}
-	return true
-}
-func (this *S2C_PrivateChatMsg) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*S2C_PrivateChatMsg)
-	if !ok {
-		that2, ok := that.(S2C_PrivateChatMsg)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.TargetName != that1.TargetName {
-		return false
-	}
-	if this.Msg != that1.Msg {
-		return false
-	}
-	if this.Result != that1.Result {
-		return false
-	}
-	return true
-}
-func (this *S2C_PrivateOtherChatMsg) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*S2C_PrivateOtherChatMsg)
-	if !ok {
-		that2, ok := that.(S2C_PrivateOtherChatMsg)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.SendName != that1.SendName {
-		return false
-	}
-	if this.Msg != that1.Msg {
-		return false
-	}
-	return true
-}
-func (this *C2S_WorldChatMsg) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*C2S_WorldChatMsg)
-	if !ok {
-		that2, ok := that.(C2S_WorldChatMsg)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.Msg != that1.Msg {
-		return false
-	}
-	return true
-}
-func (this *S2C_WorldChatMsg) Equal(that interface{}) bool {
-	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	}
-
-	that1, ok := that.(*S2C_WorldChatMsg)
-	if !ok {
-		that2, ok := that.(S2C_WorldChatMsg)
-		if ok {
-			that1 = &that2
-		} else {
-			return false
-		}
-	}
-	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
-	} else if this == nil {
-		return false
-	}
-	if this.SendName != that1.SendName {
-		return false
-	}
-	if this.Msg != that1.Msg {
-		return false
-	}
-	return true
-}
 func (this *FrameMsg) Equal(that interface{}) bool {
 	if that == nil {
 		if this == nil {
@@ -1641,6 +2052,48 @@ func (this *FrameMsg) Equal(that interface{}) bool {
 		return false
 	}
 	if !bytes.Equal(this.RawData, that1.RawData) {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	return true
+}
+func (this *FrameMsgJson) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*FrameMsgJson)
+	if !ok {
+		that2, ok := that.(FrameMsgJson)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Channel != that1.Channel {
+		return false
+	}
+	if this.MsgId != that1.MsgId {
+		return false
+	}
+	if !bytes.Equal(this.RawData, that1.RawData) {
+		return false
+	}
+	if this.Uid != that1.Uid {
 		return false
 	}
 	return true
@@ -1790,6 +2243,36 @@ func (this *BroadcastFrameMsg) Equal(that interface{}) bool {
 	that1, ok := that.(*BroadcastFrameMsg)
 	if !ok {
 		that2, ok := that.(BroadcastFrameMsg)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.FrameMsg.Equal(that1.FrameMsg) {
+		return false
+	}
+	return true
+}
+func (this *BroadcastFrameMsgJson) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*BroadcastFrameMsgJson)
+	if !ok {
+		that2, ok := that.(BroadcastFrameMsgJson)
 		if ok {
 			that1 = &that2
 		} else {
@@ -2090,6 +2573,36 @@ func (this *AddService) Equal(that interface{}) bool {
 		if !this.Values[i].Equal(that1.Values[i]) {
 			return false
 		}
+	}
+	return true
+}
+func (this *AddServiceRep) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*AddServiceRep)
+	if !ok {
+		that2, ok := that.(AddServiceRep)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
 	}
 	return true
 }
@@ -2820,6 +3333,9 @@ func (this *CreatePlayerResult) Equal(that interface{}) bool {
 	if !this.TransData.Equal(that1.TransData) {
 		return false
 	}
+	if !this.RoomPID.Equal(that1.RoomPID) {
+		return false
+	}
 	return true
 }
 func (this *PlayerOutline) Equal(that interface{}) bool {
@@ -2879,6 +3395,745 @@ func (this *Tick) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *TimeFlush) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*TimeFlush)
+	if !ok {
+		that2, ok := that.(TimeFlush)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	return true
+}
+func (this *BattleRoomInfo) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*BattleRoomInfo)
+	if !ok {
+		that2, ok := that.(BattleRoomInfo)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if this.Rtype != that1.Rtype {
+		return false
+	}
+	if this.Boss != that1.Boss {
+		return false
+	}
+	if this.Key != that1.Key {
+		return false
+	}
+	if this.Hero != that1.Hero {
+		return false
+	}
+	if len(this.Card) != len(that1.Card) {
+		return false
+	}
+	for i := range this.Card {
+		if this.Card[i] != that1.Card[i] {
+			return false
+		}
+	}
+	if len(this.Equip) != len(that1.Equip) {
+		return false
+	}
+	for i := range this.Equip {
+		if this.Equip[i] != that1.Equip[i] {
+			return false
+		}
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if this.Lv != that1.Lv {
+		return false
+	}
+	if this.Ai != that1.Ai {
+		return false
+	}
+	return true
+}
+func (this *GetLobbyInfo) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GetLobbyInfo)
+	if !ok {
+		that2, ok := that.(GetLobbyInfo)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	return true
+}
+func (this *LobbyQueueData) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*LobbyQueueData)
+	if !ok {
+		that2, ok := that.(LobbyQueueData)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Type != that1.Type {
+		return false
+	}
+	if this.Num != that1.Num {
+		return false
+	}
+	return true
+}
+func (this *BattleServerData) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*BattleServerData)
+	if !ok {
+		that2, ok := that.(BattleServerData)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Addr != that1.Addr {
+		return false
+	}
+	if this.Num != that1.Num {
+		return false
+	}
+	if this.State != that1.State {
+		return false
+	}
+	return true
+}
+func (this *GetLobbyInfoResult) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GetLobbyInfoResult)
+	if !ok {
+		that2, ok := that.(GetLobbyInfoResult)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if len(this.Queuedata) != len(that1.Queuedata) {
+		return false
+	}
+	for i := range this.Queuedata {
+		if !this.Queuedata[i].Equal(that1.Queuedata[i]) {
+			return false
+		}
+	}
+	if len(this.BattleServerData) != len(that1.BattleServerData) {
+		return false
+	}
+	for i := range this.BattleServerData {
+		if !this.BattleServerData[i].Equal(that1.BattleServerData[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *GetBattleServer) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GetBattleServer)
+	if !ok {
+		that2, ok := that.(GetBattleServer)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if this.Rtype != that1.Rtype {
+		return false
+	}
+	if this.Boss != that1.Boss {
+		return false
+	}
+	if this.Oppuid != that1.Oppuid {
+		return false
+	}
+	if !this.SelfPID.Equal(that1.SelfPID) {
+		return false
+	}
+	return true
+}
+func (this *GetBattleServerResult) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*GetBattleServerResult)
+	if !ok {
+		that2, ok := that.(GetBattleServerResult)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.BattlePID.Equal(that1.BattlePID) {
+		return false
+	}
+	if this.RoomId != that1.RoomId {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
+	}
+	return true
+}
+func (this *JoinBattleQueue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*JoinBattleQueue)
+	if !ok {
+		that2, ok := that.(JoinBattleQueue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if this.Rtype != that1.Rtype {
+		return false
+	}
+	if !bytes.Equal(this.RoomInfo, that1.RoomInfo) {
+		return false
+	}
+	if !this.Sender.Equal(that1.Sender) {
+		return false
+	}
+	if this.AiNum != that1.AiNum {
+		return false
+	}
+	return true
+}
+func (this *JoinBattleQueueResult) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*JoinBattleQueueResult)
+	if !ok {
+		that2, ok := that.(JoinBattleQueueResult)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Waittime != that1.Waittime {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
+	}
+	return true
+}
+func (this *LeaveBattleQueue) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*LeaveBattleQueue)
+	if !ok {
+		that2, ok := that.(LeaveBattleQueue)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	return true
+}
+func (this *MatchBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*MatchBattle)
+	if !ok {
+		that2, ok := that.(MatchBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.BattleAddr != that1.BattleAddr {
+		return false
+	}
+	if this.RoomId != that1.RoomId {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if this.Rtype != that1.Rtype {
+		return false
+	}
+	if !bytes.Equal(this.RoomInfo, that1.RoomInfo) {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
+	}
+	if !this.RoomPID.Equal(that1.RoomPID) {
+		return false
+	}
+	return true
+}
+func (this *CreateBattlePlayer) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*CreateBattlePlayer)
+	if !ok {
+		that2, ok := that.(CreateBattlePlayer)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if this.Name != that1.Name {
+		return false
+	}
+	if this.Skin != that1.Skin {
+		return false
+	}
+	if !this.AgentPID.Equal(that1.AgentPID) {
+		return false
+	}
+	if !this.PlayerPID.Equal(that1.PlayerPID) {
+		return false
+	}
+	return true
+}
+func (this *CreateBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*CreateBattle)
+	if !ok {
+		that2, ok := that.(CreateBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.RoomId != that1.RoomId {
+		return false
+	}
+	if this.StageId != that1.StageId {
+		return false
+	}
+	if this.Rtype != that1.Rtype {
+		return false
+	}
+	if len(this.Players) != len(that1.Players) {
+		return false
+	}
+	for i := range this.Players {
+		if !this.Players[i].Equal(that1.Players[i]) {
+			return false
+		}
+	}
+	return true
+}
+func (this *CreateBattleRep) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*CreateBattleRep)
+	if !ok {
+		that2, ok := that.(CreateBattleRep)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.RoomPID.Equal(that1.RoomPID) {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
+	}
+	return true
+}
+func (this *JoinBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*JoinBattle)
+	if !ok {
+		that2, ok := that.(JoinBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.RoomId != that1.RoomId {
+		return false
+	}
+	if !this.Player.Equal(that1.Player) {
+		return false
+	}
+	return true
+}
+func (this *AttachBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*AttachBattle)
+	if !ok {
+		that2, ok := that.(AttachBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.RoomPID.Equal(that1.RoomPID) {
+		return false
+	}
+	return true
+}
+func (this *DetachBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*DetachBattle)
+	if !ok {
+		that2, ok := that.(DetachBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	return true
+}
+func (this *RecoverBattle) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*RecoverBattle)
+	if !ok {
+		that2, ok := that.(RecoverBattle)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.Uid != that1.Uid {
+		return false
+	}
+	if !this.AgentPID.Equal(that1.AgentPID) {
+		return false
+	}
+	return true
+}
+func (this *RecoverBattleRep) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*RecoverBattleRep)
+	if !ok {
+		that2, ok := that.(RecoverBattleRep)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if !this.RoomPID.Equal(that1.RoomPID) {
+		return false
+	}
+	if this.Result != that1.Result {
+		return false
+	}
+	return true
+}
 func (this *CheckLogin) GoString() string {
 	if this == nil {
 		return "nil"
@@ -2920,70 +4175,29 @@ func (this *S2C_ShopBuyMsg) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
-func (this *C2S_PrivateChatMsg) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 6)
-	s = append(s, "&msgs.C2S_PrivateChatMsg{")
-	s = append(s, "TargetName: "+fmt.Sprintf("%#v", this.TargetName)+",\n")
-	s = append(s, "Msg: "+fmt.Sprintf("%#v", this.Msg)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *S2C_PrivateChatMsg) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 7)
-	s = append(s, "&msgs.S2C_PrivateChatMsg{")
-	s = append(s, "TargetName: "+fmt.Sprintf("%#v", this.TargetName)+",\n")
-	s = append(s, "Msg: "+fmt.Sprintf("%#v", this.Msg)+",\n")
-	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *S2C_PrivateOtherChatMsg) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 6)
-	s = append(s, "&msgs.S2C_PrivateOtherChatMsg{")
-	s = append(s, "SendName: "+fmt.Sprintf("%#v", this.SendName)+",\n")
-	s = append(s, "Msg: "+fmt.Sprintf("%#v", this.Msg)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *C2S_WorldChatMsg) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 5)
-	s = append(s, "&msgs.C2S_WorldChatMsg{")
-	s = append(s, "Msg: "+fmt.Sprintf("%#v", this.Msg)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
-func (this *S2C_WorldChatMsg) GoString() string {
-	if this == nil {
-		return "nil"
-	}
-	s := make([]string, 0, 6)
-	s = append(s, "&msgs.S2C_WorldChatMsg{")
-	s = append(s, "SendName: "+fmt.Sprintf("%#v", this.SendName)+",\n")
-	s = append(s, "Msg: "+fmt.Sprintf("%#v", this.Msg)+",\n")
-	s = append(s, "}")
-	return strings.Join(s, "")
-}
 func (this *FrameMsg) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 7)
+	s := make([]string, 0, 8)
 	s = append(s, "&msgs.FrameMsg{")
 	s = append(s, "Channel: "+fmt.Sprintf("%#v", this.Channel)+",\n")
 	s = append(s, "MsgId: "+fmt.Sprintf("%#v", this.MsgId)+",\n")
 	s = append(s, "RawData: "+fmt.Sprintf("%#v", this.RawData)+",\n")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *FrameMsgJson) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 8)
+	s = append(s, "&msgs.FrameMsgJson{")
+	s = append(s, "Channel: "+fmt.Sprintf("%#v", this.Channel)+",\n")
+	s = append(s, "MsgId: "+fmt.Sprintf("%#v", this.MsgId)+",\n")
+	s = append(s, "RawData: "+fmt.Sprintf("%#v", this.RawData)+",\n")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -3042,6 +4256,18 @@ func (this *BroadcastFrameMsg) GoString() string {
 	}
 	s := make([]string, 0, 5)
 	s = append(s, "&msgs.BroadcastFrameMsg{")
+	if this.FrameMsg != nil {
+		s = append(s, "FrameMsg: "+fmt.Sprintf("%#v", this.FrameMsg)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *BroadcastFrameMsgJson) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&msgs.BroadcastFrameMsgJson{")
 	if this.FrameMsg != nil {
 		s = append(s, "FrameMsg: "+fmt.Sprintf("%#v", this.FrameMsg)+",\n")
 	}
@@ -3148,6 +4374,16 @@ func (this *AddService) GoString() string {
 	if this.Values != nil {
 		s = append(s, "Values: "+fmt.Sprintf("%#v", this.Values)+",\n")
 	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *AddServiceRep) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&msgs.AddServiceRep{")
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -3404,7 +4640,7 @@ func (this *CreatePlayerResult) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 8)
+	s := make([]string, 0, 9)
 	s = append(s, "&msgs.CreatePlayerResult{")
 	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
 	if this.BaseInfo != nil {
@@ -3415,6 +4651,9 @@ func (this *CreatePlayerResult) GoString() string {
 	}
 	if this.TransData != nil {
 		s = append(s, "TransData: "+fmt.Sprintf("%#v", this.TransData)+",\n")
+	}
+	if this.RoomPID != nil {
+		s = append(s, "RoomPID: "+fmt.Sprintf("%#v", this.RoomPID)+",\n")
 	}
 	s = append(s, "}")
 	return strings.Join(s, "")
@@ -3435,6 +4674,272 @@ func (this *Tick) GoString() string {
 	}
 	s := make([]string, 0, 4)
 	s = append(s, "&msgs.Tick{")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *TimeFlush) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 4)
+	s = append(s, "&msgs.TimeFlush{")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *BattleRoomInfo) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 14)
+	s = append(s, "&msgs.BattleRoomInfo{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "Rtype: "+fmt.Sprintf("%#v", this.Rtype)+",\n")
+	s = append(s, "Boss: "+fmt.Sprintf("%#v", this.Boss)+",\n")
+	s = append(s, "Key: "+fmt.Sprintf("%#v", this.Key)+",\n")
+	s = append(s, "Hero: "+fmt.Sprintf("%#v", this.Hero)+",\n")
+	s = append(s, "Card: "+fmt.Sprintf("%#v", this.Card)+",\n")
+	s = append(s, "Equip: "+fmt.Sprintf("%#v", this.Equip)+",\n")
+	s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
+	s = append(s, "Lv: "+fmt.Sprintf("%#v", this.Lv)+",\n")
+	s = append(s, "Ai: "+fmt.Sprintf("%#v", this.Ai)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *GetLobbyInfo) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 4)
+	s = append(s, "&msgs.GetLobbyInfo{")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *LobbyQueueData) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.LobbyQueueData{")
+	s = append(s, "Type: "+fmt.Sprintf("%#v", this.Type)+",\n")
+	s = append(s, "Num: "+fmt.Sprintf("%#v", this.Num)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *BattleServerData) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&msgs.BattleServerData{")
+	s = append(s, "Addr: "+fmt.Sprintf("%#v", this.Addr)+",\n")
+	s = append(s, "Num: "+fmt.Sprintf("%#v", this.Num)+",\n")
+	s = append(s, "State: "+fmt.Sprintf("%#v", this.State)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *GetLobbyInfoResult) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.GetLobbyInfoResult{")
+	if this.Queuedata != nil {
+		s = append(s, "Queuedata: "+fmt.Sprintf("%#v", this.Queuedata)+",\n")
+	}
+	if this.BattleServerData != nil {
+		s = append(s, "BattleServerData: "+fmt.Sprintf("%#v", this.BattleServerData)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *GetBattleServer) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 9)
+	s = append(s, "&msgs.GetBattleServer{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "Rtype: "+fmt.Sprintf("%#v", this.Rtype)+",\n")
+	s = append(s, "Boss: "+fmt.Sprintf("%#v", this.Boss)+",\n")
+	s = append(s, "Oppuid: "+fmt.Sprintf("%#v", this.Oppuid)+",\n")
+	if this.SelfPID != nil {
+		s = append(s, "SelfPID: "+fmt.Sprintf("%#v", this.SelfPID)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *GetBattleServerResult) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 7)
+	s = append(s, "&msgs.GetBattleServerResult{")
+	if this.BattlePID != nil {
+		s = append(s, "BattlePID: "+fmt.Sprintf("%#v", this.BattlePID)+",\n")
+	}
+	s = append(s, "RoomId: "+fmt.Sprintf("%#v", this.RoomId)+",\n")
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *JoinBattleQueue) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 9)
+	s = append(s, "&msgs.JoinBattleQueue{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "Rtype: "+fmt.Sprintf("%#v", this.Rtype)+",\n")
+	s = append(s, "RoomInfo: "+fmt.Sprintf("%#v", this.RoomInfo)+",\n")
+	if this.Sender != nil {
+		s = append(s, "Sender: "+fmt.Sprintf("%#v", this.Sender)+",\n")
+	}
+	s = append(s, "AiNum: "+fmt.Sprintf("%#v", this.AiNum)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *JoinBattleQueueResult) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.JoinBattleQueueResult{")
+	s = append(s, "Waittime: "+fmt.Sprintf("%#v", this.Waittime)+",\n")
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *LeaveBattleQueue) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&msgs.LeaveBattleQueue{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *MatchBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 11)
+	s = append(s, "&msgs.MatchBattle{")
+	s = append(s, "BattleAddr: "+fmt.Sprintf("%#v", this.BattleAddr)+",\n")
+	s = append(s, "RoomId: "+fmt.Sprintf("%#v", this.RoomId)+",\n")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "Rtype: "+fmt.Sprintf("%#v", this.Rtype)+",\n")
+	s = append(s, "RoomInfo: "+fmt.Sprintf("%#v", this.RoomInfo)+",\n")
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
+	if this.RoomPID != nil {
+		s = append(s, "RoomPID: "+fmt.Sprintf("%#v", this.RoomPID)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *CreateBattlePlayer) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 9)
+	s = append(s, "&msgs.CreateBattlePlayer{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	s = append(s, "Name: "+fmt.Sprintf("%#v", this.Name)+",\n")
+	s = append(s, "Skin: "+fmt.Sprintf("%#v", this.Skin)+",\n")
+	if this.AgentPID != nil {
+		s = append(s, "AgentPID: "+fmt.Sprintf("%#v", this.AgentPID)+",\n")
+	}
+	if this.PlayerPID != nil {
+		s = append(s, "PlayerPID: "+fmt.Sprintf("%#v", this.PlayerPID)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *CreateBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 8)
+	s = append(s, "&msgs.CreateBattle{")
+	s = append(s, "RoomId: "+fmt.Sprintf("%#v", this.RoomId)+",\n")
+	s = append(s, "StageId: "+fmt.Sprintf("%#v", this.StageId)+",\n")
+	s = append(s, "Rtype: "+fmt.Sprintf("%#v", this.Rtype)+",\n")
+	if this.Players != nil {
+		s = append(s, "Players: "+fmt.Sprintf("%#v", this.Players)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *CreateBattleRep) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.CreateBattleRep{")
+	if this.RoomPID != nil {
+		s = append(s, "RoomPID: "+fmt.Sprintf("%#v", this.RoomPID)+",\n")
+	}
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *JoinBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.JoinBattle{")
+	s = append(s, "RoomId: "+fmt.Sprintf("%#v", this.RoomId)+",\n")
+	if this.Player != nil {
+		s = append(s, "Player: "+fmt.Sprintf("%#v", this.Player)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *AttachBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 5)
+	s = append(s, "&msgs.AttachBattle{")
+	if this.RoomPID != nil {
+		s = append(s, "RoomPID: "+fmt.Sprintf("%#v", this.RoomPID)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *DetachBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 4)
+	s = append(s, "&msgs.DetachBattle{")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *RecoverBattle) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.RecoverBattle{")
+	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
+	if this.AgentPID != nil {
+		s = append(s, "AgentPID: "+fmt.Sprintf("%#v", this.AgentPID)+",\n")
+	}
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
+func (this *RecoverBattleRep) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 6)
+	s = append(s, "&msgs.RecoverBattleRep{")
+	if this.RoomPID != nil {
+		s = append(s, "RoomPID: "+fmt.Sprintf("%#v", this.RoomPID)+",\n")
+	}
+	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
@@ -3544,155 +5049,6 @@ func (m *S2C_ShopBuyMsg) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *C2S_PrivateChatMsg) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *C2S_PrivateChatMsg) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.TargetName) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.TargetName)))
-		i += copy(dAtA[i:], m.TargetName)
-	}
-	if len(m.Msg) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.Msg)))
-		i += copy(dAtA[i:], m.Msg)
-	}
-	return i, nil
-}
-
-func (m *S2C_PrivateChatMsg) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *S2C_PrivateChatMsg) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.TargetName) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.TargetName)))
-		i += copy(dAtA[i:], m.TargetName)
-	}
-	if len(m.Msg) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.Msg)))
-		i += copy(dAtA[i:], m.Msg)
-	}
-	if m.Result != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
-	}
-	return i, nil
-}
-
-func (m *S2C_PrivateOtherChatMsg) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *S2C_PrivateOtherChatMsg) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.SendName) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.SendName)))
-		i += copy(dAtA[i:], m.SendName)
-	}
-	if len(m.Msg) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.Msg)))
-		i += copy(dAtA[i:], m.Msg)
-	}
-	return i, nil
-}
-
-func (m *C2S_WorldChatMsg) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *C2S_WorldChatMsg) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Msg) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.Msg)))
-		i += copy(dAtA[i:], m.Msg)
-	}
-	return i, nil
-}
-
-func (m *S2C_WorldChatMsg) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *S2C_WorldChatMsg) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.SendName) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.SendName)))
-		i += copy(dAtA[i:], m.SendName)
-	}
-	if len(m.Msg) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(len(m.Msg)))
-		i += copy(dAtA[i:], m.Msg)
-	}
-	return i, nil
-}
-
 func (m *FrameMsg) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3723,6 +5079,51 @@ func (m *FrameMsg) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(len(m.RawData)))
 		i += copy(dAtA[i:], m.RawData)
+	}
+	if m.Uid != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	return i, nil
+}
+
+func (m *FrameMsgJson) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FrameMsgJson) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Channel != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Channel))
+	}
+	if len(m.MsgId) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.MsgId)))
+		i += copy(dAtA[i:], m.MsgId)
+	}
+	if len(m.RawData) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RawData)))
+		i += copy(dAtA[i:], m.RawData)
+	}
+	if m.Uid != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
 	}
 	return i, nil
 }
@@ -3889,6 +5290,34 @@ func (m *BroadcastFrameMsg) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *BroadcastFrameMsgJson) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BroadcastFrameMsgJson) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.FrameMsg != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.FrameMsg.Size()))
+		n7, err := m.FrameMsg.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	return i, nil
+}
+
 func (m *AddAgentToParent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -3913,11 +5342,11 @@ func (m *AddAgentToParent) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Sender.Size()))
-		n7, err := m.Sender.MarshalTo(dAtA[i:])
+		n8, err := m.Sender.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n8
 	}
 	return i, nil
 }
@@ -3982,11 +5411,11 @@ func (m *NewChildResult) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Pid.Size()))
-		n8, err := m.Pid.MarshalTo(dAtA[i:])
+		n9, err := m.Pid.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i += n9
 	}
 	return i, nil
 }
@@ -4010,11 +5439,11 @@ func (m *Connect) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Sender.Size()))
-		n9, err := m.Sender.MarshalTo(dAtA[i:])
+		n10, err := m.Sender.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i += n10
 	}
 	return i, nil
 }
@@ -4122,11 +5551,11 @@ func (m *AddService) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Pid.Size()))
-		n10, err := m.Pid.MarshalTo(dAtA[i:])
+		n11, err := m.Pid.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n10
+		i += n11
 	}
 	if len(m.Values) > 0 {
 		for _, msg := range m.Values {
@@ -4139,6 +5568,29 @@ func (m *AddService) MarshalTo(dAtA []byte) (int, error) {
 			}
 			i += n
 		}
+	}
+	return i, nil
+}
+
+func (m *AddServiceRep) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AddServiceRep) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Result != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
 	}
 	return i, nil
 }
@@ -4246,11 +5698,11 @@ func (m *ApplyServiceResult) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Pid.Size()))
-		n11, err := m.Pid.MarshalTo(dAtA[i:])
+		n12, err := m.Pid.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n11
+		i += n12
 	}
 	if len(m.Values) > 0 {
 		for _, msg := range m.Values {
@@ -4455,21 +5907,21 @@ func (m *GetSessionInfoResult) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.UserInfo.Size()))
-		n12, err := m.UserInfo.MarshalTo(dAtA[i:])
+		n13, err := m.UserInfo.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n12
+		i += n13
 	}
 	if m.AgentPID != nil {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.AgentPID.Size()))
-		n13, err := m.AgentPID.MarshalTo(dAtA[i:])
+		n14, err := m.AgentPID.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n13
+		i += n14
 	}
 	if m.Result != 0 {
 		dAtA[i] = 0x18
@@ -4614,11 +6066,11 @@ func (m *ServerCheckLogin) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.AgentPID.Size()))
-		n14, err := m.AgentPID.MarshalTo(dAtA[i:])
+		n15, err := m.AgentPID.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n14
+		i += n15
 	}
 	return i, nil
 }
@@ -4647,11 +6099,11 @@ func (m *UserBindServer) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.Pid.Size()))
-		n15, err := m.Pid.MarshalTo(dAtA[i:])
+		n16, err := m.Pid.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n15
+		i += n16
 	}
 	return i, nil
 }
@@ -4730,11 +6182,11 @@ func (m *CheckLoginResult) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.BaseInfo.Size()))
-		n16, err := m.BaseInfo.MarshalTo(dAtA[i:])
+		n17, err := m.BaseInfo.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n16
+		i += n17
 	}
 	if len(m.BindServers) > 0 {
 		for _, msg := range m.BindServers {
@@ -4775,31 +6227,31 @@ func (m *CreatePlayer) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.AgentPID.Size()))
-		n17, err := m.AgentPID.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n17
-	}
-	if m.Sender != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(m.Sender.Size()))
-		n18, err := m.Sender.MarshalTo(dAtA[i:])
+		n18, err := m.AgentPID.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n18
 	}
-	if m.GatePID != nil {
-		dAtA[i] = 0x22
+	if m.Sender != nil {
+		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintProtos(dAtA, i, uint64(m.GatePID.Size()))
-		n19, err := m.GatePID.MarshalTo(dAtA[i:])
+		i = encodeVarintProtos(dAtA, i, uint64(m.Sender.Size()))
+		n19, err := m.Sender.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n19
+	}
+	if m.GatePID != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.GatePID.Size()))
+		n20, err := m.GatePID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n20
 	}
 	if len(m.Key) > 0 {
 		dAtA[i] = 0x2a
@@ -4834,31 +6286,41 @@ func (m *CreatePlayerResult) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintProtos(dAtA, i, uint64(m.BaseInfo.Size()))
-		n20, err := m.BaseInfo.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n20
-	}
-	if m.PlayerPID != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintProtos(dAtA, i, uint64(m.PlayerPID.Size()))
-		n21, err := m.PlayerPID.MarshalTo(dAtA[i:])
+		n21, err := m.BaseInfo.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n21
 	}
-	if m.TransData != nil {
-		dAtA[i] = 0x22
+	if m.PlayerPID != nil {
+		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintProtos(dAtA, i, uint64(m.TransData.Size()))
-		n22, err := m.TransData.MarshalTo(dAtA[i:])
+		i = encodeVarintProtos(dAtA, i, uint64(m.PlayerPID.Size()))
+		n22, err := m.PlayerPID.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
 		i += n22
+	}
+	if m.TransData != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.TransData.Size()))
+		n23, err := m.TransData.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n23
+	}
+	if m.RoomPID != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.RoomPID.Size()))
+		n24, err := m.RoomPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n24
 	}
 	return i, nil
 }
@@ -4902,6 +6364,766 @@ func (m *Tick) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	return i, nil
+}
+
+func (m *TimeFlush) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TimeFlush) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	return i, nil
+}
+
+func (m *BattleRoomInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BattleRoomInfo) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Rtype))
+	}
+	if m.Boss != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Boss))
+	}
+	if len(m.Key) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.Key)))
+		i += copy(dAtA[i:], m.Key)
+	}
+	if m.Hero != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Hero))
+	}
+	if len(m.Card) > 0 {
+		for _, s := range m.Card {
+			dAtA[i] = 0x32
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	if len(m.Equip) > 0 {
+		dAtA26 := make([]byte, len(m.Equip)*10)
+		var j25 int
+		for _, num1 := range m.Equip {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA26[j25] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j25++
+			}
+			dAtA26[j25] = uint8(num)
+			j25++
+		}
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(j25))
+		i += copy(dAtA[i:], dAtA26[:j25])
+	}
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x42
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if m.Lv != 0 {
+		dAtA[i] = 0x48
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Lv))
+	}
+	if m.Ai != 0 {
+		dAtA[i] = 0x50
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Ai))
+	}
+	return i, nil
+}
+
+func (m *GetLobbyInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetLobbyInfo) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	return i, nil
+}
+
+func (m *LobbyQueueData) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LobbyQueueData) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Type != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Type))
+	}
+	if m.Num != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Num))
+	}
+	return i, nil
+}
+
+func (m *BattleServerData) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *BattleServerData) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Addr) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.Addr)))
+		i += copy(dAtA[i:], m.Addr)
+	}
+	if m.Num != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Num))
+	}
+	if m.State != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.State))
+	}
+	return i, nil
+}
+
+func (m *GetLobbyInfoResult) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetLobbyInfoResult) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Queuedata) > 0 {
+		for _, msg := range m.Queuedata {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintProtos(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.BattleServerData) > 0 {
+		for _, msg := range m.BattleServerData {
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintProtos(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *GetBattleServer) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetBattleServer) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Rtype))
+	}
+	if m.Boss != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Boss))
+	}
+	if m.Oppuid != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Oppuid))
+	}
+	if m.SelfPID != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.SelfPID.Size()))
+		n27, err := m.SelfPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n27
+	}
+	return i, nil
+}
+
+func (m *GetBattleServerResult) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GetBattleServerResult) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.BattlePID != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.BattlePID.Size()))
+		n28, err := m.BattlePID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n28
+	}
+	if len(m.RoomId) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomId)))
+		i += copy(dAtA[i:], m.RoomId)
+	}
+	if m.Result != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
+	}
+	return i, nil
+}
+
+func (m *JoinBattleQueue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinBattleQueue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Rtype))
+	}
+	if len(m.RoomInfo) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomInfo)))
+		i += copy(dAtA[i:], m.RoomInfo)
+	}
+	if m.Sender != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Sender.Size()))
+		n29, err := m.Sender.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n29
+	}
+	if m.AiNum != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.AiNum))
+	}
+	return i, nil
+}
+
+func (m *JoinBattleQueueResult) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinBattleQueueResult) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Waittime != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Waittime))
+	}
+	if m.Result != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
+	}
+	return i, nil
+}
+
+func (m *LeaveBattleQueue) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LeaveBattleQueue) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	return i, nil
+}
+
+func (m *MatchBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MatchBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.BattleAddr) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.BattleAddr)))
+		i += copy(dAtA[i:], m.BattleAddr)
+	}
+	if len(m.RoomId) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomId)))
+		i += copy(dAtA[i:], m.RoomId)
+	}
+	if m.Uid != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		dAtA[i] = 0x20
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Rtype))
+	}
+	if len(m.RoomInfo) > 0 {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomInfo)))
+		i += copy(dAtA[i:], m.RoomInfo)
+	}
+	if m.Result != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
+	}
+	if m.RoomPID != nil {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.RoomPID.Size()))
+		n30, err := m.RoomPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n30
+	}
+	return i, nil
+}
+
+func (m *CreateBattlePlayer) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateBattlePlayer) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
+	}
+	if m.Skin != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Skin))
+	}
+	if m.AgentPID != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.AgentPID.Size()))
+		n31, err := m.AgentPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n31
+	}
+	if m.PlayerPID != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.PlayerPID.Size()))
+		n32, err := m.PlayerPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n32
+	}
+	return i, nil
+}
+
+func (m *CreateBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.RoomId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomId)))
+		i += copy(dAtA[i:], m.RoomId)
+	}
+	if m.StageId != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.StageId))
+	}
+	if m.Rtype != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Rtype))
+	}
+	if len(m.Players) > 0 {
+		for _, msg := range m.Players {
+			dAtA[i] = 0x22
+			i++
+			i = encodeVarintProtos(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *CreateBattleRep) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CreateBattleRep) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.RoomPID.Size()))
+		n33, err := m.RoomPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n33
+	}
+	if m.Result != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
+	}
+	return i, nil
+}
+
+func (m *JoinBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *JoinBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.RoomId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(len(m.RoomId)))
+		i += copy(dAtA[i:], m.RoomId)
+	}
+	if m.Player != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Player.Size()))
+		n34, err := m.Player.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n34
+	}
+	return i, nil
+}
+
+func (m *AttachBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AttachBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.RoomPID.Size()))
+		n35, err := m.RoomPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n35
+	}
+	return i, nil
+}
+
+func (m *DetachBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DetachBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	return i, nil
+}
+
+func (m *RecoverBattle) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RecoverBattle) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Uid))
+	}
+	if m.AgentPID != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.AgentPID.Size()))
+		n36, err := m.AgentPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n36
+	}
+	return i, nil
+}
+
+func (m *RecoverBattleRep) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RecoverBattleRep) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.RoomPID.Size()))
+		n37, err := m.RoomPID.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n37
+	}
+	if m.Result != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintProtos(dAtA, i, uint64(m.Result))
+	}
 	return i, nil
 }
 
@@ -4972,75 +7194,6 @@ func (m *S2C_ShopBuyMsg) Size() (n int) {
 	return n
 }
 
-func (m *C2S_PrivateChatMsg) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.TargetName)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	l = len(m.Msg)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	return n
-}
-
-func (m *S2C_PrivateChatMsg) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.TargetName)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	l = len(m.Msg)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	if m.Result != 0 {
-		n += 1 + sovProtos(uint64(m.Result))
-	}
-	return n
-}
-
-func (m *S2C_PrivateOtherChatMsg) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.SendName)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	l = len(m.Msg)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	return n
-}
-
-func (m *C2S_WorldChatMsg) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Msg)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	return n
-}
-
-func (m *S2C_WorldChatMsg) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.SendName)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	l = len(m.Msg)
-	if l > 0 {
-		n += 1 + l + sovProtos(uint64(l))
-	}
-	return n
-}
-
 func (m *FrameMsg) Size() (n int) {
 	var l int
 	_ = l
@@ -5053,6 +7206,29 @@ func (m *FrameMsg) Size() (n int) {
 	l = len(m.RawData)
 	if l > 0 {
 		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	return n
+}
+
+func (m *FrameMsgJson) Size() (n int) {
+	var l int
+	_ = l
+	if m.Channel != 0 {
+		n += 1 + sovProtos(uint64(m.Channel))
+	}
+	l = len(m.MsgId)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	l = len(m.RawData)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
 	}
 	return n
 }
@@ -5110,6 +7286,16 @@ func (m *MulticastFrameMsg) Size() (n int) {
 }
 
 func (m *BroadcastFrameMsg) Size() (n int) {
+	var l int
+	_ = l
+	if m.FrameMsg != nil {
+		l = m.FrameMsg.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *BroadcastFrameMsgJson) Size() (n int) {
 	var l int
 	_ = l
 	if m.FrameMsg != nil {
@@ -5217,6 +7403,15 @@ func (m *AddService) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovProtos(uint64(l))
 		}
+	}
+	return n
+}
+
+func (m *AddServiceRep) Size() (n int) {
+	var l int
+	_ = l
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
 	}
 	return n
 }
@@ -5528,6 +7723,10 @@ func (m *CreatePlayerResult) Size() (n int) {
 		l = m.TransData.Size()
 		n += 1 + l + sovProtos(uint64(l))
 	}
+	if m.RoomPID != nil {
+		l = m.RoomPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
 	return n
 }
 
@@ -5544,6 +7743,338 @@ func (m *PlayerOutline) Size() (n int) {
 func (m *Tick) Size() (n int) {
 	var l int
 	_ = l
+	return n
+}
+
+func (m *TimeFlush) Size() (n int) {
+	var l int
+	_ = l
+	return n
+}
+
+func (m *BattleRoomInfo) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		n += 1 + sovProtos(uint64(m.Rtype))
+	}
+	if m.Boss != 0 {
+		n += 1 + sovProtos(uint64(m.Boss))
+	}
+	l = len(m.Key)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Hero != 0 {
+		n += 1 + sovProtos(uint64(m.Hero))
+	}
+	if len(m.Card) > 0 {
+		for _, s := range m.Card {
+			l = len(s)
+			n += 1 + l + sovProtos(uint64(l))
+		}
+	}
+	if len(m.Equip) > 0 {
+		l = 0
+		for _, e := range m.Equip {
+			l += sovProtos(uint64(e))
+		}
+		n += 1 + sovProtos(uint64(l)) + l
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Lv != 0 {
+		n += 1 + sovProtos(uint64(m.Lv))
+	}
+	if m.Ai != 0 {
+		n += 1 + sovProtos(uint64(m.Ai))
+	}
+	return n
+}
+
+func (m *GetLobbyInfo) Size() (n int) {
+	var l int
+	_ = l
+	return n
+}
+
+func (m *LobbyQueueData) Size() (n int) {
+	var l int
+	_ = l
+	if m.Type != 0 {
+		n += 1 + sovProtos(uint64(m.Type))
+	}
+	if m.Num != 0 {
+		n += 1 + sovProtos(uint64(m.Num))
+	}
+	return n
+}
+
+func (m *BattleServerData) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Addr)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Num != 0 {
+		n += 1 + sovProtos(uint64(m.Num))
+	}
+	if m.State != 0 {
+		n += 1 + sovProtos(uint64(m.State))
+	}
+	return n
+}
+
+func (m *GetLobbyInfoResult) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Queuedata) > 0 {
+		for _, e := range m.Queuedata {
+			l = e.Size()
+			n += 1 + l + sovProtos(uint64(l))
+		}
+	}
+	if len(m.BattleServerData) > 0 {
+		for _, e := range m.BattleServerData {
+			l = e.Size()
+			n += 1 + l + sovProtos(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *GetBattleServer) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		n += 1 + sovProtos(uint64(m.Rtype))
+	}
+	if m.Boss != 0 {
+		n += 1 + sovProtos(uint64(m.Boss))
+	}
+	if m.Oppuid != 0 {
+		n += 1 + sovProtos(uint64(m.Oppuid))
+	}
+	if m.SelfPID != nil {
+		l = m.SelfPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *GetBattleServerResult) Size() (n int) {
+	var l int
+	_ = l
+	if m.BattlePID != nil {
+		l = m.BattlePID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	l = len(m.RoomId)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
+	}
+	return n
+}
+
+func (m *JoinBattleQueue) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		n += 1 + sovProtos(uint64(m.Rtype))
+	}
+	l = len(m.RoomInfo)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Sender != nil {
+		l = m.Sender.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.AiNum != 0 {
+		n += 1 + sovProtos(uint64(m.AiNum))
+	}
+	return n
+}
+
+func (m *JoinBattleQueueResult) Size() (n int) {
+	var l int
+	_ = l
+	if m.Waittime != 0 {
+		n += 1 + sovProtos(uint64(m.Waittime))
+	}
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
+	}
+	return n
+}
+
+func (m *LeaveBattleQueue) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	return n
+}
+
+func (m *MatchBattle) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.BattleAddr)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	l = len(m.RoomId)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	if m.Rtype != 0 {
+		n += 1 + sovProtos(uint64(m.Rtype))
+	}
+	l = len(m.RoomInfo)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
+	}
+	if m.RoomPID != nil {
+		l = m.RoomPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *CreateBattlePlayer) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Skin != 0 {
+		n += 1 + sovProtos(uint64(m.Skin))
+	}
+	if m.AgentPID != nil {
+		l = m.AgentPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.PlayerPID != nil {
+		l = m.PlayerPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *CreateBattle) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.RoomId)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.StageId != 0 {
+		n += 1 + sovProtos(uint64(m.StageId))
+	}
+	if m.Rtype != 0 {
+		n += 1 + sovProtos(uint64(m.Rtype))
+	}
+	if len(m.Players) > 0 {
+		for _, e := range m.Players {
+			l = e.Size()
+			n += 1 + l + sovProtos(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *CreateBattleRep) Size() (n int) {
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		l = m.RoomPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
+	}
+	return n
+}
+
+func (m *JoinBattle) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.RoomId)
+	if l > 0 {
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Player != nil {
+		l = m.Player.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *AttachBattle) Size() (n int) {
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		l = m.RoomPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *DetachBattle) Size() (n int) {
+	var l int
+	_ = l
+	return n
+}
+
+func (m *RecoverBattle) Size() (n int) {
+	var l int
+	_ = l
+	if m.Uid != 0 {
+		n += 1 + sovProtos(uint64(m.Uid))
+	}
+	if m.AgentPID != nil {
+		l = m.AgentPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	return n
+}
+
+func (m *RecoverBattleRep) Size() (n int) {
+	var l int
+	_ = l
+	if m.RoomPID != nil {
+		l = m.RoomPID.Size()
+		n += 1 + l + sovProtos(uint64(l))
+	}
+	if m.Result != 0 {
+		n += 1 + sovProtos(uint64(m.Result))
+	}
 	return n
 }
 
@@ -5601,61 +8132,6 @@ func (this *S2C_ShopBuyMsg) String() string {
 	}, "")
 	return s
 }
-func (this *C2S_PrivateChatMsg) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&C2S_PrivateChatMsg{`,
-		`TargetName:` + fmt.Sprintf("%v", this.TargetName) + `,`,
-		`Msg:` + fmt.Sprintf("%v", this.Msg) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *S2C_PrivateChatMsg) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&S2C_PrivateChatMsg{`,
-		`TargetName:` + fmt.Sprintf("%v", this.TargetName) + `,`,
-		`Msg:` + fmt.Sprintf("%v", this.Msg) + `,`,
-		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *S2C_PrivateOtherChatMsg) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&S2C_PrivateOtherChatMsg{`,
-		`SendName:` + fmt.Sprintf("%v", this.SendName) + `,`,
-		`Msg:` + fmt.Sprintf("%v", this.Msg) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *C2S_WorldChatMsg) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&C2S_WorldChatMsg{`,
-		`Msg:` + fmt.Sprintf("%v", this.Msg) + `,`,
-		`}`,
-	}, "")
-	return s
-}
-func (this *S2C_WorldChatMsg) String() string {
-	if this == nil {
-		return "nil"
-	}
-	s := strings.Join([]string{`&S2C_WorldChatMsg{`,
-		`SendName:` + fmt.Sprintf("%v", this.SendName) + `,`,
-		`Msg:` + fmt.Sprintf("%v", this.Msg) + `,`,
-		`}`,
-	}, "")
-	return s
-}
 func (this *FrameMsg) String() string {
 	if this == nil {
 		return "nil"
@@ -5664,6 +8140,20 @@ func (this *FrameMsg) String() string {
 		`Channel:` + fmt.Sprintf("%v", this.Channel) + `,`,
 		`MsgId:` + fmt.Sprintf("%v", this.MsgId) + `,`,
 		`RawData:` + fmt.Sprintf("%v", this.RawData) + `,`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *FrameMsgJson) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&FrameMsgJson{`,
+		`Channel:` + fmt.Sprintf("%v", this.Channel) + `,`,
+		`MsgId:` + fmt.Sprintf("%v", this.MsgId) + `,`,
+		`RawData:` + fmt.Sprintf("%v", this.RawData) + `,`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5717,6 +8207,16 @@ func (this *BroadcastFrameMsg) String() string {
 	}
 	s := strings.Join([]string{`&BroadcastFrameMsg{`,
 		`FrameMsg:` + strings.Replace(fmt.Sprintf("%v", this.FrameMsg), "FrameMsg", "FrameMsg", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *BroadcastFrameMsgJson) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&BroadcastFrameMsgJson{`,
+		`FrameMsg:` + strings.Replace(fmt.Sprintf("%v", this.FrameMsg), "FrameMsgJson", "FrameMsgJson", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -5810,6 +8310,16 @@ func (this *AddService) String() string {
 		`ServiceType:` + fmt.Sprintf("%v", this.ServiceType) + `,`,
 		`Pid:` + strings.Replace(fmt.Sprintf("%v", this.Pid), "PID", "actor.PID", 1) + `,`,
 		`Values:` + strings.Replace(fmt.Sprintf("%v", this.Values), "ServiceValue", "ServiceValue", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AddServiceRep) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AddServiceRep{`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6048,6 +8558,7 @@ func (this *CreatePlayerResult) String() string {
 		`BaseInfo:` + strings.Replace(fmt.Sprintf("%v", this.BaseInfo), "UserBaseInfo", "UserBaseInfo", 1) + `,`,
 		`PlayerPID:` + strings.Replace(fmt.Sprintf("%v", this.PlayerPID), "PID", "actor.PID", 1) + `,`,
 		`TransData:` + strings.Replace(fmt.Sprintf("%v", this.TransData), "CreatePlayer", "CreatePlayer", 1) + `,`,
+		`RoomPID:` + strings.Replace(fmt.Sprintf("%v", this.RoomPID), "PID", "actor.PID", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6067,6 +8578,244 @@ func (this *Tick) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&Tick{`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *TimeFlush) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&TimeFlush{`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *BattleRoomInfo) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&BattleRoomInfo{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Rtype:` + fmt.Sprintf("%v", this.Rtype) + `,`,
+		`Boss:` + fmt.Sprintf("%v", this.Boss) + `,`,
+		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
+		`Hero:` + fmt.Sprintf("%v", this.Hero) + `,`,
+		`Card:` + fmt.Sprintf("%v", this.Card) + `,`,
+		`Equip:` + fmt.Sprintf("%v", this.Equip) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Lv:` + fmt.Sprintf("%v", this.Lv) + `,`,
+		`Ai:` + fmt.Sprintf("%v", this.Ai) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetLobbyInfo) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetLobbyInfo{`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *LobbyQueueData) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&LobbyQueueData{`,
+		`Type:` + fmt.Sprintf("%v", this.Type) + `,`,
+		`Num:` + fmt.Sprintf("%v", this.Num) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *BattleServerData) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&BattleServerData{`,
+		`Addr:` + fmt.Sprintf("%v", this.Addr) + `,`,
+		`Num:` + fmt.Sprintf("%v", this.Num) + `,`,
+		`State:` + fmt.Sprintf("%v", this.State) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetLobbyInfoResult) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetLobbyInfoResult{`,
+		`Queuedata:` + strings.Replace(fmt.Sprintf("%v", this.Queuedata), "LobbyQueueData", "LobbyQueueData", 1) + `,`,
+		`BattleServerData:` + strings.Replace(fmt.Sprintf("%v", this.BattleServerData), "BattleServerData", "BattleServerData", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetBattleServer) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetBattleServer{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Rtype:` + fmt.Sprintf("%v", this.Rtype) + `,`,
+		`Boss:` + fmt.Sprintf("%v", this.Boss) + `,`,
+		`Oppuid:` + fmt.Sprintf("%v", this.Oppuid) + `,`,
+		`SelfPID:` + strings.Replace(fmt.Sprintf("%v", this.SelfPID), "PID", "actor.PID", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *GetBattleServerResult) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&GetBattleServerResult{`,
+		`BattlePID:` + strings.Replace(fmt.Sprintf("%v", this.BattlePID), "PID", "actor.PID", 1) + `,`,
+		`RoomId:` + fmt.Sprintf("%v", this.RoomId) + `,`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *JoinBattleQueue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&JoinBattleQueue{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Rtype:` + fmt.Sprintf("%v", this.Rtype) + `,`,
+		`RoomInfo:` + fmt.Sprintf("%v", this.RoomInfo) + `,`,
+		`Sender:` + strings.Replace(fmt.Sprintf("%v", this.Sender), "PID", "actor.PID", 1) + `,`,
+		`AiNum:` + fmt.Sprintf("%v", this.AiNum) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *JoinBattleQueueResult) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&JoinBattleQueueResult{`,
+		`Waittime:` + fmt.Sprintf("%v", this.Waittime) + `,`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *LeaveBattleQueue) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&LeaveBattleQueue{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *MatchBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&MatchBattle{`,
+		`BattleAddr:` + fmt.Sprintf("%v", this.BattleAddr) + `,`,
+		`RoomId:` + fmt.Sprintf("%v", this.RoomId) + `,`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Rtype:` + fmt.Sprintf("%v", this.Rtype) + `,`,
+		`RoomInfo:` + fmt.Sprintf("%v", this.RoomInfo) + `,`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
+		`RoomPID:` + strings.Replace(fmt.Sprintf("%v", this.RoomPID), "PID", "actor.PID", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateBattlePlayer) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateBattlePlayer{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`Name:` + fmt.Sprintf("%v", this.Name) + `,`,
+		`Skin:` + fmt.Sprintf("%v", this.Skin) + `,`,
+		`AgentPID:` + strings.Replace(fmt.Sprintf("%v", this.AgentPID), "PID", "actor.PID", 1) + `,`,
+		`PlayerPID:` + strings.Replace(fmt.Sprintf("%v", this.PlayerPID), "PID", "actor.PID", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateBattle{`,
+		`RoomId:` + fmt.Sprintf("%v", this.RoomId) + `,`,
+		`StageId:` + fmt.Sprintf("%v", this.StageId) + `,`,
+		`Rtype:` + fmt.Sprintf("%v", this.Rtype) + `,`,
+		`Players:` + strings.Replace(fmt.Sprintf("%v", this.Players), "CreateBattlePlayer", "CreateBattlePlayer", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *CreateBattleRep) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&CreateBattleRep{`,
+		`RoomPID:` + strings.Replace(fmt.Sprintf("%v", this.RoomPID), "PID", "actor.PID", 1) + `,`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *JoinBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&JoinBattle{`,
+		`RoomId:` + fmt.Sprintf("%v", this.RoomId) + `,`,
+		`Player:` + strings.Replace(fmt.Sprintf("%v", this.Player), "CreateBattlePlayer", "CreateBattlePlayer", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *AttachBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&AttachBattle{`,
+		`RoomPID:` + strings.Replace(fmt.Sprintf("%v", this.RoomPID), "PID", "actor.PID", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *DetachBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&DetachBattle{`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RecoverBattle) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RecoverBattle{`,
+		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
+		`AgentPID:` + strings.Replace(fmt.Sprintf("%v", this.AgentPID), "PID", "actor.PID", 1) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *RecoverBattleRep) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&RecoverBattleRep{`,
+		`RoomPID:` + strings.Replace(fmt.Sprintf("%v", this.RoomPID), "PID", "actor.PID", 1) + `,`,
+		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -6384,536 +9133,6 @@ func (m *S2C_ShopBuyMsg) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *C2S_PrivateChatMsg) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtos
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: C2S_PrivateChatMsg: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: C2S_PrivateChatMsg: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Msg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtos(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProtos
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *S2C_PrivateChatMsg) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtos
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: S2C_PrivateChatMsg: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: S2C_PrivateChatMsg: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TargetName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TargetName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Msg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
-			}
-			m.Result = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Result |= (GAErrorCode(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtos(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProtos
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *S2C_PrivateOtherChatMsg) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtos
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: S2C_PrivateOtherChatMsg: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: S2C_PrivateOtherChatMsg: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SendName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SendName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Msg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtos(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProtos
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *C2S_WorldChatMsg) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtos
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: C2S_WorldChatMsg: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: C2S_WorldChatMsg: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Msg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtos(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProtos
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *S2C_WorldChatMsg) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowProtos
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: S2C_WorldChatMsg: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: S2C_WorldChatMsg: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SendName", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SendName = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowProtos
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthProtos
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Msg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipProtos(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthProtos
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *FrameMsg) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7012,6 +9231,173 @@ func (m *FrameMsg) Unmarshal(dAtA []byte) error {
 				m.RawData = []byte{}
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *FrameMsgJson) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FrameMsgJson: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FrameMsgJson: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Channel", wireType)
+			}
+			m.Channel = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Channel |= (ChannelType(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MsgId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MsgId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RawData", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RawData = append(m.RawData[:0], dAtA[iNdEx:postIndex]...)
+			if m.RawData == nil {
+				m.RawData = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProtos(dAtA[iNdEx:])
@@ -7508,6 +9894,89 @@ func (m *BroadcastFrameMsg) Unmarshal(dAtA []byte) error {
 			}
 			if m.FrameMsg == nil {
 				m.FrameMsg = &FrameMsg{}
+			}
+			if err := m.FrameMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BroadcastFrameMsgJson) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BroadcastFrameMsgJson: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BroadcastFrameMsgJson: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FrameMsg", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.FrameMsg == nil {
+				m.FrameMsg = &FrameMsgJson{}
 			}
 			if err := m.FrameMsg.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -8309,6 +10778,75 @@ func (m *AddService) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AddServiceRep) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AddServiceRep: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AddServiceRep: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProtos(dAtA[iNdEx:])
@@ -10656,6 +13194,39 @@ func (m *CreatePlayerResult) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RoomPID == nil {
+				m.RoomPID = &actor.PID{}
+			}
+			if err := m.RoomPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProtos(dAtA[iNdEx:])
@@ -10806,6 +13377,2465 @@ func (m *Tick) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *TimeFlush) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TimeFlush: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TimeFlush: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BattleRoomInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BattleRoomInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BattleRoomInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rtype", wireType)
+			}
+			m.Rtype = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rtype |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Boss", wireType)
+			}
+			m.Boss = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Boss |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Key = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Hero", wireType)
+			}
+			m.Hero = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Hero |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Card", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Card = append(m.Card, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 7:
+			if wireType == 0 {
+				var v int32
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProtos
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= (int32(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				m.Equip = append(m.Equip, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProtos
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= (int(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthProtos
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				for iNdEx < postIndex {
+					var v int32
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowProtos
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= (int32(b) & 0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Equip = append(m.Equip, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Equip", wireType)
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Lv", wireType)
+			}
+			m.Lv = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Lv |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ai", wireType)
+			}
+			m.Ai = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Ai |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetLobbyInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetLobbyInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetLobbyInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LobbyQueueData) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LobbyQueueData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LobbyQueueData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			}
+			m.Type = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Type |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Num", wireType)
+			}
+			m.Num = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Num |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *BattleServerData) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: BattleServerData: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: BattleServerData: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Addr", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Addr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Num", wireType)
+			}
+			m.Num = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Num |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetLobbyInfoResult) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetLobbyInfoResult: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetLobbyInfoResult: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Queuedata", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Queuedata = append(m.Queuedata, &LobbyQueueData{})
+			if err := m.Queuedata[len(m.Queuedata)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BattleServerData", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BattleServerData = append(m.BattleServerData, &BattleServerData{})
+			if err := m.BattleServerData[len(m.BattleServerData)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetBattleServer) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetBattleServer: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetBattleServer: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rtype", wireType)
+			}
+			m.Rtype = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rtype |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Boss", wireType)
+			}
+			m.Boss = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Boss |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Oppuid", wireType)
+			}
+			m.Oppuid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Oppuid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SelfPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SelfPID == nil {
+				m.SelfPID = &actor.PID{}
+			}
+			if err := m.SelfPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GetBattleServerResult) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GetBattleServerResult: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GetBattleServerResult: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BattlePID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.BattlePID == nil {
+				m.BattlePID = &actor.PID{}
+			}
+			if err := m.BattlePID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinBattleQueue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinBattleQueue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinBattleQueue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rtype", wireType)
+			}
+			m.Rtype = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rtype |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomInfo", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomInfo = append(m.RoomInfo[:0], dAtA[iNdEx:postIndex]...)
+			if m.RoomInfo == nil {
+				m.RoomInfo = []byte{}
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sender", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Sender == nil {
+				m.Sender = &actor.PID{}
+			}
+			if err := m.Sender.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AiNum", wireType)
+			}
+			m.AiNum = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AiNum |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinBattleQueueResult) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinBattleQueueResult: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinBattleQueueResult: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Waittime", wireType)
+			}
+			m.Waittime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Waittime |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LeaveBattleQueue) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LeaveBattleQueue: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LeaveBattleQueue: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MatchBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MatchBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MatchBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BattleAddr", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.BattleAddr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rtype", wireType)
+			}
+			m.Rtype = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rtype |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomInfo", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomInfo = append(m.RoomInfo[:0], dAtA[iNdEx:postIndex]...)
+			if m.RoomInfo == nil {
+				m.RoomInfo = []byte{}
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RoomPID == nil {
+				m.RoomPID = &actor.PID{}
+			}
+			if err := m.RoomPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateBattlePlayer) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateBattlePlayer: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateBattlePlayer: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Skin", wireType)
+			}
+			m.Skin = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Skin |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AgentPID == nil {
+				m.AgentPID = &actor.PID{}
+			}
+			if err := m.AgentPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PlayerPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.PlayerPID == nil {
+				m.PlayerPID = &actor.PID{}
+			}
+			if err := m.PlayerPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StageId", wireType)
+			}
+			m.StageId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StageId |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Rtype", wireType)
+			}
+			m.Rtype = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Rtype |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Players = append(m.Players, &CreateBattlePlayer{})
+			if err := m.Players[len(m.Players)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CreateBattleRep) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CreateBattleRep: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CreateBattleRep: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RoomPID == nil {
+				m.RoomPID = &actor.PID{}
+			}
+			if err := m.RoomPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *JoinBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: JoinBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: JoinBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RoomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Player", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Player == nil {
+				m.Player = &CreateBattlePlayer{}
+			}
+			if err := m.Player.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AttachBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AttachBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AttachBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RoomPID == nil {
+				m.RoomPID = &actor.PID{}
+			}
+			if err := m.RoomPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DetachBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DetachBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DetachBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RecoverBattle) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RecoverBattle: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RecoverBattle: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.AgentPID == nil {
+				m.AgentPID = &actor.PID{}
+			}
+			if err := m.AgentPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RecoverBattleRep) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtos
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RecoverBattleRep: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RecoverBattleRep: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RoomPID", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtos
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RoomPID == nil {
+				m.RoomPID = &actor.PID{}
+			}
+			if err := m.RoomPID.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
+			}
+			m.Result = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtos
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Result |= (GAErrorCode(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtos(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtos
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipProtos(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -10914,95 +15944,124 @@ var (
 func init() { proto.RegisterFile("protos.proto", fileDescriptorProtos) }
 
 var fileDescriptorProtos = []byte{
-	// 1427 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x57, 0x4f, 0x6f, 0xdb, 0xc6,
-	0x12, 0x17, 0x25, 0x5a, 0x7f, 0x46, 0xb2, 0x4c, 0xf3, 0x39, 0xef, 0xe9, 0x05, 0x85, 0x60, 0x2c,
-	0xdc, 0x56, 0x51, 0x1b, 0xd9, 0x70, 0x80, 0x04, 0xe8, 0xa5, 0xb5, 0xe4, 0xd8, 0x11, 0x52, 0x27,
-	0x06, 0x65, 0xb7, 0x28, 0x02, 0xb4, 0x58, 0x93, 0x6b, 0x8a, 0x30, 0x45, 0x32, 0xbb, 0x2b, 0x39,
-	0xba, 0xf5, 0xdc, 0x53, 0xaf, 0xed, 0xb9, 0x05, 0xfa, 0x51, 0x0a, 0x14, 0x05, 0x72, 0xec, 0xb1,
-	0x51, 0x2f, 0x3d, 0xe6, 0x23, 0x14, 0xbb, 0x5c, 0x4a, 0x94, 0x23, 0xd7, 0x71, 0x9a, 0x9e, 0xb8,
-	0x33, 0x3b, 0x7f, 0x7e, 0x33, 0x3b, 0x33, 0xcb, 0x85, 0x4a, 0x44, 0x43, 0x1e, 0xb2, 0x96, 0xfc,
-	0x98, 0xfa, 0x80, 0xb9, 0xec, 0xe6, 0x5d, 0xd7, 0xe3, 0xfd, 0xe1, 0x49, 0xcb, 0x0e, 0x07, 0x9b,
-	0x3b, 0x6c, 0x1c, 0x9c, 0xd1, 0x30, 0xe8, 0x1e, 0x6d, 0x4a, 0x11, 0x6c, 0xf3, 0x90, 0xde, 0x76,
-	0xc3, 0x4d, 0xb9, 0xd8, 0x4c, 0x6b, 0xdf, 0x2c, 0xb3, 0x3e, 0xa6, 0x24, 0x26, 0xd0, 0x16, 0x40,
-	0xa7, 0x4f, 0xec, 0xb3, 0x4f, 0x43, 0xd7, 0x0b, 0x4c, 0x03, 0x72, 0x43, 0xcf, 0xa9, 0x69, 0xeb,
-	0x5a, 0x43, 0xb7, 0xc4, 0x52, 0x70, 0xce, 0xc8, 0xb8, 0x96, 0x5d, 0xd7, 0x1a, 0x25, 0x4b, 0x2c,
-	0x51, 0x15, 0x2a, 0x0f, 0x08, 0xa6, 0xbc, 0x4d, 0x30, 0x3f, 0x60, 0x2e, 0x6a, 0x40, 0xb5, 0xb3,
-	0xdd, 0xfb, 0xaa, 0xd7, 0x0f, 0xa3, 0xf6, 0x70, 0x7c, 0xc0, 0x5c, 0xf3, 0xbf, 0x90, 0xf7, 0x38,
-	0x19, 0x74, 0x63, 0x43, 0xcb, 0x96, 0xa2, 0x50, 0x0f, 0xaa, 0xbd, 0xed, 0xce, 0x6b, 0x48, 0x9a,
-	0xb7, 0x20, 0x4f, 0x09, 0x1b, 0xfa, 0x5c, 0x3a, 0xae, 0x6e, 0xaf, 0xb6, 0x44, 0xc4, 0xad, 0xfd,
-	0x9d, 0xfb, 0x94, 0x86, 0xb4, 0x13, 0x3a, 0xc4, 0x52, 0x02, 0x68, 0x0f, 0x4c, 0xe1, 0xfe, 0x90,
-	0x7a, 0x23, 0xcc, 0x49, 0xa7, 0x2f, 0x41, 0x99, 0x75, 0x00, 0x8e, 0xa9, 0x4b, 0xf8, 0x23, 0x3c,
-	0x20, 0xd2, 0x78, 0xc9, 0x4a, 0x71, 0x44, 0x58, 0x03, 0xe6, 0x26, 0x61, 0x0d, 0x98, 0x8b, 0x9e,
-	0x82, 0x29, 0xc0, 0xfd, 0x53, 0x3b, 0x29, 0xe8, 0xb9, 0xab, 0xa0, 0xef, 0xc3, 0xff, 0x52, 0x2e,
-	0x1f, 0xf3, 0x3e, 0xa1, 0x89, 0xdf, 0x9b, 0x50, 0x64, 0x24, 0x70, 0x52, 0x5e, 0xa7, 0xf4, 0x02,
-	0xec, 0x1b, 0x60, 0x88, 0x1c, 0x7c, 0x1e, 0x52, 0xdf, 0x49, 0x2c, 0x28, 0x29, 0x6d, 0x26, 0xf5,
-	0x09, 0x18, 0xc2, 0xdd, 0x9c, 0xd4, 0xf5, 0xfc, 0xb8, 0x50, 0xdc, 0xa3, 0x78, 0x40, 0x84, 0xe6,
-	0x07, 0x50, 0xb0, 0xfb, 0x38, 0x08, 0x88, 0x2f, 0x15, 0xa7, 0x81, 0x76, 0x62, 0xe6, 0xd1, 0x38,
-	0x22, 0x56, 0x22, 0x61, 0xae, 0xc1, 0xd2, 0x80, 0xb9, 0x5d, 0x47, 0x1a, 0x5b, 0xb6, 0x62, 0xc2,
-	0xac, 0x41, 0x81, 0xe2, 0xf3, 0x5d, 0xcc, 0xb1, 0xcc, 0x55, 0xc5, 0x4a, 0x48, 0x74, 0x1f, 0xca,
-	0x89, 0x23, 0x8b, 0x3c, 0x35, 0x37, 0x60, 0xe9, 0x94, 0x26, 0x10, 0xcb, 0xdb, 0xd5, 0xd8, 0xd3,
-	0x54, 0x22, 0xde, 0x14, 0x78, 0xed, 0x20, 0x54, 0x2e, 0xc4, 0x12, 0x7d, 0x94, 0x36, 0x13, 0x09,
-	0xc8, 0x84, 0xca, 0x23, 0x98, 0x87, 0x9c, 0x3e, 0x9b, 0x44, 0x02, 0x1d, 0xc3, 0xca, 0x71, 0xe0,
-	0xd9, 0x98, 0xf1, 0x69, 0xc8, 0x4d, 0x28, 0x9e, 0xaa, 0xf5, 0x25, 0x48, 0xa6, 0xfb, 0xa2, 0xb2,
-	0xe3, 0x32, 0x91, 0x78, 0x74, 0x4b, 0x51, 0xe8, 0x0b, 0x58, 0x3d, 0x18, 0xfa, 0xfc, 0xcd, 0x0d,
-	0xd7, 0xa0, 0x10, 0x9b, 0x62, 0xb5, 0xec, 0x7a, 0xae, 0xa1, 0x5b, 0x09, 0x89, 0x3e, 0x86, 0xd5,
-	0x36, 0x0d, 0xb1, 0xf3, 0xa6, 0xa6, 0xd1, 0x03, 0x30, 0x76, 0x1c, 0x67, 0xc7, 0x25, 0x01, 0x3f,
-	0x0a, 0x0f, 0x31, 0x25, 0x01, 0x5f, 0x30, 0x11, 0x10, 0xe4, 0x45, 0x89, 0x10, 0x2a, 0x23, 0x2b,
-	0x6f, 0x43, 0x4b, 0xce, 0x98, 0xd6, 0x61, 0x77, 0xd7, 0x52, 0x3b, 0xe8, 0x16, 0xdc, 0xb0, 0xc8,
-	0x20, 0x1c, 0x11, 0x69, 0x6c, 0x8f, 0x86, 0x83, 0xcb, 0xcc, 0x21, 0x80, 0xe2, 0x23, 0x72, 0xde,
-	0xe9, 0x7b, 0xbe, 0x83, 0x5a, 0x50, 0x4d, 0xd6, 0x96, 0x6c, 0x11, 0xf3, 0x1d, 0xc8, 0x45, 0x4a,
-	0x7e, 0xde, 0x93, 0x60, 0xa3, 0xdb, 0x50, 0xe8, 0x84, 0x41, 0x40, 0x6c, 0x2e, 0x50, 0xf5, 0x62,
-	0x54, 0xda, 0xa5, 0xa8, 0xde, 0x85, 0x92, 0x12, 0x27, 0xb2, 0xf8, 0x0e, 0x08, 0x63, 0xd8, 0x4d,
-	0x0a, 0xbf, 0x30, 0x88, 0x49, 0x54, 0x01, 0xe8, 0x45, 0xf8, 0x3c, 0x90, 0xd8, 0xd1, 0x5d, 0xa8,
-	0xf4, 0x08, 0x1d, 0x79, 0x36, 0xf9, 0x0c, 0xfb, 0x43, 0x59, 0x65, 0x0f, 0xc9, 0x38, 0xe9, 0xab,
-	0x33, 0x32, 0x16, 0xc5, 0x2d, 0xb7, 0x54, 0xa7, 0x2c, 0x8d, 0x04, 0x81, 0xbe, 0xd7, 0x00, 0x76,
-	0x1c, 0x47, 0xe9, 0x9a, 0xeb, 0x50, 0x66, 0xf1, 0x32, 0xd5, 0x6b, 0x69, 0x56, 0x4a, 0x42, 0xf4,
-	0x8e, 0x32, 0x96, 0x66, 0x25, 0xc9, 0xc8, 0x2d, 0x4c, 0x86, 0xd9, 0x84, 0xbc, 0xf4, 0xcc, 0x6a,
-	0xfa, 0x7a, 0xae, 0x51, 0xde, 0x36, 0xe3, 0x73, 0x4e, 0x83, 0xb7, 0x94, 0x04, 0x2a, 0xc6, 0xd9,
-	0x7a, 0xfc, 0x10, 0xf5, 0x60, 0x39, 0x3e, 0xa9, 0xb7, 0x08, 0x14, 0x6d, 0x41, 0x65, 0x27, 0x8a,
-	0xfc, 0xf1, 0xab, 0x36, 0xa5, 0x86, 0xf6, 0xaa, 0xc6, 0xaf, 0x1a, 0x98, 0x69, 0x15, 0x75, 0xfc,
-	0x57, 0x2a, 0x5e, 0x84, 0x9b, 0x7d, 0x15, 0xee, 0x5b, 0xcb, 0x5a, 0x6a, 0xb4, 0x2f, 0x5d, 0x35,
-	0xda, 0xef, 0xc0, 0xca, 0x3e, 0xe1, 0x02, 0xa1, 0xb2, 0xc4, 0x5e, 0x23, 0x09, 0xf7, 0xe0, 0xc6,
-	0x05, 0x25, 0x95, 0x86, 0x3a, 0xe8, 0x91, 0xe7, 0xb0, 0x9a, 0x26, 0x21, 0xa6, 0x63, 0x90, 0x7c,
-	0x14, 0xc2, 0xf2, 0x71, 0xe4, 0x87, 0xf8, 0x1a, 0xd5, 0x66, 0x82, 0x2e, 0x14, 0xd4, 0xb4, 0x94,
-	0x6b, 0xb3, 0x01, 0x4b, 0x8c, 0x63, 0x4e, 0xd4, 0xcd, 0x35, 0x9f, 0x8a, 0x9e, 0xd8, 0xb1, 0x62,
-	0x01, 0x74, 0x0f, 0x4a, 0xc7, 0x8c, 0xd0, 0xf8, 0xa7, 0xa1, 0x06, 0x05, 0x6c, 0xdb, 0xe1, 0x30,
-	0xe0, 0x49, 0x27, 0x29, 0x32, 0xe9, 0xf6, 0xec, 0xac, 0xdb, 0x11, 0x54, 0xf7, 0x09, 0xef, 0x11,
-	0xc6, 0xbc, 0x30, 0xe8, 0x06, 0xa7, 0xe1, 0x82, 0x89, 0xd0, 0x84, 0xb5, 0x79, 0x99, 0xf6, 0x38,
-	0x81, 0x1c, 0xcc, 0xa2, 0x91, 0x6b, 0xf4, 0x9d, 0x76, 0x51, 0x58, 0xa5, 0xac, 0x05, 0xc5, 0x21,
-	0x23, 0x54, 0x70, 0xd4, 0x44, 0x50, 0xe1, 0x08, 0xdc, 0x6d, 0xcc, 0x88, 0x94, 0x9d, 0xca, 0x98,
-	0xef, 0x41, 0x11, 0x8b, 0x7e, 0x3f, 0xec, 0xee, 0x2e, 0x98, 0x6b, 0xd3, 0xbd, 0xeb, 0x5c, 0xef,
-	0x26, 0x18, 0x1d, 0xdf, 0x23, 0x01, 0xdf, 0xf5, 0x98, 0x1d, 0xcf, 0x1d, 0x74, 0x1b, 0x56, 0x2d,
-	0x62, 0x13, 0x91, 0xd0, 0x78, 0x4f, 0x8d, 0x74, 0x8a, 0xcf, 0x1d, 0x71, 0x0f, 0x6a, 0xd3, 0x7b,
-	0x50, 0x90, 0xe8, 0x89, 0xca, 0x33, 0xc1, 0x23, 0xb2, 0x60, 0x14, 0x6f, 0x80, 0x7e, 0x4a, 0xc3,
-	0x81, 0xfa, 0x49, 0x32, 0x66, 0xe7, 0x45, 0xa8, 0xbc, 0x7f, 0xe5, 0xae, 0xb8, 0x8a, 0x28, 0xc1,
-	0x2c, 0x0c, 0x24, 0xe4, 0x92, 0xa5, 0x28, 0xb4, 0x05, 0xfa, 0x43, 0xcf, 0x3e, 0x5b, 0x60, 0x77,
-	0xa6, 0x91, 0x9d, 0xd3, 0xf8, 0x12, 0x8c, 0xd8, 0xfa, 0xf5, 0x7e, 0x19, 0xe7, 0x92, 0x9b, 0xbb,
-	0x3c, 0xb9, 0xe8, 0x09, 0x54, 0xe5, 0xf1, 0x78, 0x81, 0x13, 0xfb, 0xb9, 0xde, 0x5f, 0x86, 0xea,
-	0xf4, 0xec, 0xe2, 0xcb, 0xe2, 0x1b, 0x0d, 0x2a, 0xe9, 0xc3, 0xff, 0x9b, 0xba, 0x4d, 0x2a, 0x2d,
-	0x3b, 0xab, 0xb4, 0x24, 0xce, 0xdc, 0x2c, 0xce, 0x2a, 0x64, 0xfd, 0x51, 0x4d, 0x97, 0x8c, 0xac,
-	0x3f, 0x12, 0x12, 0xe4, 0x59, 0x24, 0x67, 0x83, 0x6e, 0x89, 0xa5, 0xf0, 0x40, 0x9e, 0x45, 0xdc,
-	0x1b, 0x90, 0x5a, 0x5e, 0x72, 0x13, 0x12, 0xfd, 0xa8, 0x81, 0x31, 0x4b, 0xa2, 0xaa, 0xd9, 0x59,
-	0x6d, 0x69, 0x57, 0xd4, 0x96, 0x28, 0xef, 0x13, 0x15, 0x87, 0x8a, 0x77, 0x61, 0x79, 0x27, 0x32,
-	0xe6, 0x5d, 0x28, 0x9f, 0x4c, 0xb3, 0xca, 0x6a, 0x39, 0x39, 0x48, 0xd6, 0x52, 0x2a, 0xd3, 0x4d,
-	0x2b, 0x2d, 0x88, 0x7e, 0xd0, 0xa0, 0xd2, 0xa1, 0x04, 0x73, 0x72, 0xe8, 0xe3, 0x31, 0xa1, 0x0b,
-	0x8e, 0xfb, 0x75, 0x3b, 0x67, 0xf6, 0xdf, 0x90, 0xbb, 0xec, 0x86, 0x36, 0x37, 0xa0, 0xe0, 0x0a,
-	0x5f, 0xdd, 0x5d, 0x99, 0xd7, 0x79, 0xa1, 0x64, 0x2b, 0x29, 0xb0, 0xa5, 0xd9, 0x9b, 0xe4, 0x17,
-	0x0d, 0xcc, 0x34, 0xcc, 0x7f, 0x3f, 0xa1, 0x0d, 0x28, 0x45, 0xd2, 0xd5, 0xe2, 0x9a, 0x9e, 0x6d,
-	0x9a, 0x5b, 0x50, 0xe2, 0x14, 0x07, 0x4c, 0xfe, 0xe7, 0xea, 0x69, 0xd3, 0x73, 0x88, 0x67, 0x42,
-	0xe8, 0x7d, 0x58, 0x8e, 0x99, 0x8f, 0x87, 0xdc, 0xf7, 0x02, 0x92, 0xea, 0x47, 0x6d, 0xae, 0x1f,
-	0xf3, 0xa0, 0x1f, 0x79, 0xf6, 0x59, 0xb3, 0x07, 0x65, 0xf1, 0xa8, 0x3a, 0x60, 0xae, 0xbc, 0x13,
-	0x57, 0xa0, 0x9c, 0x7a, 0x91, 0x19, 0x19, 0xc1, 0x48, 0x3d, 0xbc, 0x0c, 0xcd, 0x34, 0xa0, 0x92,
-	0x48, 0xf4, 0x88, 0xef, 0x1b, 0x59, 0xc1, 0x49, 0x44, 0x24, 0x27, 0xd7, 0xfc, 0x3f, 0x40, 0x1b,
-	0xbb, 0x89, 0xcd, 0x32, 0x14, 0xc4, 0x7e, 0x1b, 0xbb, 0x46, 0xa6, 0x79, 0x0e, 0x65, 0xf5, 0x80,
-	0x90, 0x7b, 0xff, 0x81, 0x95, 0x0b, 0x4f, 0x30, 0x23, 0x23, 0x98, 0x17, 0xde, 0x53, 0x86, 0x66,
-	0xd6, 0x60, 0x6d, 0xd1, 0x8b, 0xc7, 0xc8, 0x9a, 0xab, 0xb0, 0x3c, 0xf7, 0x84, 0x31, 0x72, 0x82,
-	0x35, 0xf7, 0x5e, 0x31, 0xf4, 0xe6, 0xde, 0xf4, 0x67, 0x4c, 0x5e, 0x47, 0xe6, 0x5a, 0x3c, 0x90,
-	0x12, 0x7a, 0x8f, 0x12, 0xa2, 0xc2, 0x8d, 0xb9, 0x7b, 0x43, 0xdf, 0x37, 0xb4, 0x14, 0xa3, 0xc7,
-	0xc3, 0xc8, 0xc8, 0xb6, 0x3f, 0x7c, 0xfe, 0xa2, 0x9e, 0xf9, 0xed, 0x45, 0x3d, 0xf3, 0xf2, 0x45,
-	0x5d, 0xfb, 0x7a, 0x52, 0xd7, 0x7e, 0x9a, 0xd4, 0xb5, 0x9f, 0x27, 0x75, 0xed, 0xf9, 0xa4, 0xae,
-	0xfd, 0x3e, 0xa9, 0x6b, 0x7f, 0x4e, 0xea, 0x99, 0x97, 0x93, 0xba, 0xf6, 0xed, 0x1f, 0xf5, 0xcc,
-	0x49, 0x5e, 0x3e, 0x95, 0xef, 0xfc, 0x15, 0x00, 0x00, 0xff, 0xff, 0xe5, 0x7e, 0xe8, 0x6b, 0x85,
-	0x0f, 0x00, 0x00,
+	// 1892 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0x4d, 0x6f, 0x1b, 0xc7,
+	0xf9, 0xd7, 0x92, 0xcb, 0xb7, 0x87, 0x14, 0x45, 0x2f, 0x64, 0x83, 0x7f, 0xe3, 0x0f, 0x42, 0x18,
+	0xb8, 0xad, 0xa2, 0xd6, 0xb4, 0xa0, 0x14, 0x0e, 0x90, 0x4b, 0x21, 0x52, 0x91, 0xa2, 0x38, 0x72,
+	0xdc, 0xa5, 0x1c, 0xa0, 0x08, 0x90, 0x62, 0xb8, 0x3b, 0x22, 0x17, 0x5a, 0xee, 0xac, 0x77, 0x86,
+	0x52, 0x78, 0x28, 0xd0, 0x43, 0x4f, 0x6d, 0x81, 0xf6, 0xda, 0x9e, 0x7a, 0x68, 0x81, 0x7e, 0x94,
+	0x5e, 0x0a, 0xf8, 0x58, 0xf4, 0x54, 0xab, 0x97, 0x1e, 0xd3, 0x6f, 0x50, 0xcc, 0xcb, 0xee, 0x0e,
+	0x45, 0xd2, 0x92, 0x9c, 0xe4, 0xc4, 0x79, 0x66, 0x9e, 0xd7, 0xdf, 0x3c, 0x2f, 0xb3, 0x84, 0x46,
+	0x9c, 0x50, 0x4e, 0x59, 0x57, 0xfe, 0x38, 0xf6, 0x84, 0x8d, 0xd8, 0xc3, 0xa7, 0xa3, 0x80, 0x8f,
+	0xa7, 0xc3, 0xae, 0x47, 0x27, 0x4f, 0xf6, 0xd9, 0x2c, 0x3a, 0x4f, 0x68, 0x74, 0x7c, 0xfa, 0x44,
+	0xb2, 0x60, 0x8f, 0xd3, 0xe4, 0xf1, 0x88, 0x3e, 0x91, 0x8b, 0x27, 0xa6, 0xf4, 0xc3, 0x3a, 0x1b,
+	0xe3, 0x84, 0x28, 0x02, 0xed, 0x02, 0xf4, 0xc7, 0xc4, 0x3b, 0xff, 0x94, 0x8e, 0x82, 0xc8, 0x69,
+	0x41, 0x71, 0x1a, 0xf8, 0x6d, 0x6b, 0xcb, 0xda, 0xb6, 0x5d, 0xb1, 0x14, 0x3b, 0xe7, 0x64, 0xd6,
+	0x2e, 0x6c, 0x59, 0xdb, 0x35, 0x57, 0x2c, 0x51, 0x13, 0x1a, 0x1f, 0x13, 0x9c, 0xf0, 0x1e, 0xc1,
+	0xfc, 0x84, 0x8d, 0xd0, 0x36, 0x34, 0xfb, 0x7b, 0x83, 0x9f, 0x0f, 0xc6, 0x34, 0xee, 0x4d, 0x67,
+	0x27, 0x6c, 0xe4, 0x3c, 0x80, 0x72, 0xc0, 0xc9, 0xe4, 0x58, 0x29, 0x5a, 0x77, 0x35, 0x85, 0x06,
+	0xd0, 0x1c, 0xec, 0xf5, 0x6f, 0xc1, 0xe9, 0xbc, 0x07, 0xe5, 0x84, 0xb0, 0x69, 0xc8, 0xa5, 0xe1,
+	0xe6, 0xde, 0xbd, 0xae, 0x88, 0xb8, 0x7b, 0xb4, 0xff, 0x51, 0x92, 0xd0, 0xa4, 0x4f, 0x7d, 0xe2,
+	0x6a, 0x06, 0x34, 0x83, 0xea, 0x61, 0x82, 0x27, 0x44, 0xa8, 0xfb, 0x21, 0x54, 0xbc, 0x31, 0x8e,
+	0x22, 0x12, 0x4a, 0x7d, 0x99, 0x5c, 0x5f, 0x6d, 0x9e, 0xce, 0x62, 0xe2, 0xa6, 0x1c, 0xce, 0x26,
+	0x94, 0x26, 0x6c, 0x74, 0xec, 0x4b, 0x13, 0xeb, 0xae, 0x22, 0x9c, 0x36, 0x54, 0x12, 0x7c, 0x79,
+	0x80, 0x39, 0x6e, 0x17, 0xb7, 0xac, 0xed, 0x86, 0x9b, 0x92, 0x29, 0x36, 0x76, 0x86, 0x0d, 0xfa,
+	0x05, 0x34, 0x52, 0xd3, 0x9f, 0x30, 0x1a, 0x7d, 0x03, 0xf3, 0xb5, 0x77, 0x31, 0xff, 0x11, 0xd4,
+	0x53, 0xf3, 0x2e, 0x79, 0xe5, 0x3c, 0x82, 0xd2, 0x99, 0x20, 0xa5, 0xed, 0xfa, 0x5e, 0x53, 0xd9,
+	0xce, 0x38, 0xd4, 0xa1, 0x50, 0xe3, 0x45, 0x54, 0xc7, 0x2c, 0x96, 0xe8, 0x43, 0x53, 0x4d, 0x2c,
+	0x82, 0x20, 0x89, 0x84, 0x78, 0x3e, 0x08, 0x13, 0xfb, 0x94, 0x03, 0xbd, 0x84, 0x8d, 0x97, 0x51,
+	0xe0, 0x61, 0xc6, 0xb3, 0x3b, 0xd8, 0x81, 0xea, 0x99, 0x5e, 0xaf, 0xf0, 0x24, 0x3b, 0x17, 0xd7,
+	0xcf, 0x71, 0x32, 0x22, 0xea, 0x9a, 0x6d, 0x57, 0x53, 0xe8, 0x67, 0x70, 0xef, 0x64, 0x1a, 0xf2,
+	0x77, 0x57, 0xdc, 0x86, 0x8a, 0x52, 0xc5, 0xda, 0x85, 0xad, 0xe2, 0xb6, 0xed, 0xa6, 0x24, 0xfa,
+	0x09, 0xdc, 0xeb, 0x25, 0x14, 0xfb, 0xef, 0xaa, 0x1a, 0x1d, 0xc1, 0xfd, 0x05, 0x05, 0xf2, 0xf6,
+	0xbb, 0x0b, 0x4a, 0x9c, 0x79, 0x25, 0x82, 0xcb, 0x50, 0xf4, 0x31, 0xb4, 0xf6, 0x7d, 0x7f, 0x7f,
+	0x44, 0x22, 0x7e, 0x4a, 0x5f, 0xe0, 0x84, 0x44, 0x7c, 0x49, 0xfd, 0x21, 0x28, 0x33, 0x12, 0xf9,
+	0x24, 0x91, 0x10, 0xd5, 0xf7, 0xa0, 0x2b, 0x2b, 0xba, 0xfb, 0xe2, 0xf8, 0xc0, 0xd5, 0x27, 0xe8,
+	0x3d, 0xb8, 0xef, 0x92, 0x09, 0xbd, 0x20, 0x52, 0xd9, 0x61, 0x42, 0x27, 0xab, 0xd4, 0x21, 0x80,
+	0xea, 0x73, 0x72, 0xd9, 0x1f, 0x07, 0xa1, 0x8f, 0xba, 0xd0, 0x4c, 0xd7, 0xae, 0xac, 0x25, 0xe7,
+	0xff, 0xa1, 0x18, 0x6b, 0xfe, 0x79, 0x4b, 0x62, 0x1b, 0x3d, 0x86, 0x4a, 0x9f, 0x46, 0x11, 0xf1,
+	0xb8, 0xf0, 0x6a, 0xa0, 0xbc, 0xb2, 0x56, 0x7a, 0xf5, 0x3d, 0xa8, 0x69, 0x76, 0x22, 0xf3, 0xfa,
+	0x84, 0x30, 0x86, 0x47, 0x2a, 0xab, 0x6a, 0x6e, 0x65, 0xa2, 0x48, 0xd4, 0x00, 0x18, 0xc4, 0xf8,
+	0x32, 0x92, 0xbe, 0xa3, 0xa7, 0xd0, 0x18, 0x90, 0xe4, 0x22, 0xf0, 0xc8, 0xe7, 0x38, 0x9c, 0xca,
+	0x74, 0x7d, 0x46, 0x66, 0x5a, 0x46, 0xb4, 0x1f, 0x51, 0x37, 0xf2, 0x28, 0xad, 0x9b, 0x0b, 0x41,
+	0xa0, 0x3f, 0x5a, 0x00, 0xfb, 0xbe, 0xaf, 0x65, 0x9d, 0x2d, 0xa8, 0x33, 0xb5, 0x7c, 0x9e, 0x56,
+	0x44, 0xcd, 0x35, 0xb7, 0x0c, 0x0e, 0x51, 0x96, 0x5a, 0x99, 0xb9, 0x95, 0x82, 0x51, 0x5c, 0x0a,
+	0x86, 0xb3, 0x03, 0x65, 0x69, 0x99, 0xb5, 0xed, 0xad, 0x62, 0x7e, 0xd7, 0xa6, 0xf3, 0xae, 0xe6,
+	0x40, 0x1f, 0xc2, 0x7a, 0xee, 0x9b, 0xa8, 0xb1, 0xbc, 0xbd, 0x59, 0x37, 0xb5, 0xb7, 0xaa, 0x42,
+	0xfa, 0xb3, 0x67, 0x68, 0x00, 0xeb, 0xea, 0x96, 0xbf, 0xc5, 0x20, 0xd1, 0x2e, 0x34, 0xf6, 0xe3,
+	0x38, 0x9c, 0x2d, 0xea, 0x94, 0x12, 0xd6, 0xa2, 0xc4, 0xdf, 0x2d, 0x70, 0x4c, 0x11, 0x9d, 0x3a,
+	0x37, 0x0a, 0x5e, 0x77, 0xb7, 0xb0, 0xe8, 0xee, 0xb7, 0x86, 0xb8, 0x01, 0x70, 0xe9, 0x26, 0x80,
+	0xdf, 0x87, 0x8d, 0x23, 0xc2, 0x85, 0x87, 0x5a, 0x13, 0xbb, 0x05, 0x08, 0x1f, 0xc0, 0xfd, 0x6b,
+	0x42, 0x1a, 0x86, 0x0e, 0xd8, 0x71, 0xe0, 0xb3, 0xb6, 0x25, 0x5d, 0x34, 0x63, 0x90, 0xfb, 0x88,
+	0xc2, 0xfa, 0xcb, 0x38, 0xa4, 0xf8, 0x0e, 0x99, 0xea, 0x80, 0x2d, 0x04, 0x74, 0xcb, 0x96, 0x6b,
+	0x67, 0x1b, 0x4a, 0x8c, 0x63, 0x4e, 0x24, 0x56, 0xcd, 0x6b, 0x50, 0x0c, 0xc4, 0x89, 0xab, 0x18,
+	0xd0, 0x07, 0x50, 0x7b, 0xc9, 0x48, 0xa2, 0xc6, 0x7b, 0x1b, 0x2a, 0xd8, 0xf3, 0xe8, 0x34, 0xe2,
+	0x69, 0x15, 0x6a, 0x32, 0xed, 0x14, 0x85, 0xbc, 0x53, 0x20, 0x68, 0x1e, 0x11, 0x3e, 0x20, 0x8c,
+	0x05, 0x34, 0x3a, 0x8e, 0xce, 0xe8, 0x92, 0x6e, 0xb2, 0x03, 0x9b, 0xf3, 0x3c, 0xbd, 0x59, 0xea,
+	0x72, 0x94, 0x47, 0x23, 0xd7, 0xe8, 0x0f, 0xd6, 0x75, 0x66, 0x0d, 0x59, 0x17, 0xaa, 0x53, 0x46,
+	0x12, 0xb1, 0x33, 0xdf, 0x37, 0x85, 0xdf, 0x3d, 0xcc, 0x88, 0xe4, 0xcd, 0x78, 0x9c, 0xef, 0x43,
+	0x15, 0x8b, 0x5e, 0xf1, 0xe2, 0xf8, 0x60, 0x49, 0x4f, 0xcc, 0xce, 0x8c, 0x1c, 0x28, 0xde, 0x94,
+	0x03, 0x0e, 0xb4, 0xfa, 0x61, 0x40, 0x22, 0x7e, 0x10, 0x30, 0x4f, 0xf5, 0x2c, 0xf4, 0x18, 0xee,
+	0xb9, 0xc4, 0x23, 0x02, 0x50, 0x75, 0xa6, 0xe7, 0x4a, 0x82, 0x2f, 0x7d, 0x31, 0x9e, 0xad, 0x6c,
+	0x3c, 0x0b, 0x12, 0x7d, 0xa1, 0x71, 0x26, 0xf8, 0x82, 0x2c, 0x69, 0xe3, 0x8f, 0xc0, 0x3e, 0x4b,
+	0xe8, 0x44, 0x3f, 0x67, 0x5a, 0xf9, 0x7d, 0x91, 0x44, 0x3e, 0x0b, 0xe4, 0xa9, 0x98, 0x87, 0x09,
+	0xc1, 0x8c, 0x46, 0xd2, 0xe5, 0x9a, 0xab, 0x29, 0xb4, 0x0b, 0xf6, 0xb3, 0xc0, 0x3b, 0x5f, 0xa2,
+	0x37, 0x97, 0x28, 0xcc, 0x49, 0x7c, 0x09, 0x2d, 0xa5, 0xfd, 0x6e, 0x8f, 0xbb, 0x39, 0x70, 0x8b,
+	0xab, 0xc1, 0x45, 0x5f, 0x40, 0x53, 0x5e, 0x4f, 0x10, 0xf9, 0xca, 0xce, 0xdd, 0x1e, 0x3f, 0xba,
+	0xd2, 0x0b, 0xcb, 0x07, 0xcd, 0xaf, 0x2d, 0x68, 0x98, 0x97, 0xff, 0x96, 0xbc, 0x4d, 0x33, 0xad,
+	0x90, 0x67, 0x5a, 0x1a, 0x67, 0x31, 0x8f, 0xb3, 0x09, 0x85, 0xf0, 0x42, 0x3f, 0x9d, 0x0a, 0xe1,
+	0x85, 0xe0, 0x20, 0x5f, 0xc5, 0xb2, 0x37, 0xd8, 0xae, 0x58, 0x0a, 0x0b, 0xe4, 0xab, 0x98, 0x07,
+	0x13, 0xd2, 0x2e, 0xcb, 0xdd, 0x94, 0x44, 0x7f, 0xb1, 0xa0, 0x95, 0x83, 0xa8, 0x73, 0xf6, 0xf6,
+	0x0d, 0x5c, 0xa4, 0xf7, 0x50, 0xc7, 0xa1, 0xe3, 0x5d, 0x9a, 0xde, 0x29, 0x8f, 0xf3, 0x14, 0xea,
+	0xc3, 0x0c, 0x55, 0xd6, 0x2e, 0xca, 0x46, 0xb2, 0x69, 0x88, 0x64, 0x87, 0xae, 0xc9, 0x88, 0xfe,
+	0x6c, 0x41, 0xa3, 0x9f, 0x10, 0xcc, 0xc9, 0x8b, 0x10, 0xcf, 0x48, 0xb2, 0xe4, 0xba, 0x6f, 0x5b,
+	0x39, 0xf9, 0x9b, 0xa3, 0xb8, 0x6a, 0xba, 0x3b, 0x8f, 0xa0, 0x32, 0x12, 0xb6, 0x8e, 0x0f, 0x24,
+	0xae, 0xf3, 0x4c, 0xe9, 0x51, 0x9a, 0x60, 0xa5, 0xfc, 0xeb, 0xe1, 0xbf, 0x16, 0x38, 0xa6, 0x9b,
+	0xdf, 0x3d, 0xa0, 0xdb, 0x50, 0x8b, 0xa5, 0xa9, 0xe5, 0x39, 0x9d, 0x1f, 0x3a, 0xbb, 0x50, 0xe3,
+	0x09, 0x8e, 0x98, 0x7c, 0x7e, 0xdb, 0xa6, 0xea, 0x39, 0x8f, 0x73, 0x26, 0x81, 0x42, 0x42, 0xe9,
+	0x44, 0x68, 0x2e, 0x2d, 0xa2, 0xa0, 0x8f, 0xd0, 0x0f, 0x60, 0x5d, 0x89, 0x7e, 0x36, 0xe5, 0x61,
+	0x10, 0x11, 0xa3, 0x6a, 0xad, 0xb9, 0xaa, 0x2d, 0x83, 0x7d, 0x1a, 0x78, 0xe7, 0xa8, 0x0e, 0xb5,
+	0xd3, 0x60, 0x42, 0x0e, 0xc3, 0x29, 0x1b, 0xa3, 0xd7, 0x16, 0x34, 0x7b, 0x98, 0xf3, 0x90, 0xb8,
+	0x94, 0x4e, 0x96, 0x77, 0x62, 0xf1, 0x2a, 0x4a, 0x78, 0x3a, 0xe3, 0x4b, 0xae, 0x22, 0x44, 0x75,
+	0x0c, 0x29, 0x63, 0x32, 0xea, 0x92, 0x2b, 0xd7, 0xe9, 0x95, 0xd8, 0x79, 0xcd, 0x3b, 0x60, 0x8f,
+	0x49, 0x42, 0x65, 0x04, 0x25, 0x57, 0xae, 0xc5, 0x9e, 0x87, 0x13, 0xbf, 0x5d, 0xde, 0x2a, 0x8a,
+	0xba, 0x12, 0x6b, 0x61, 0x83, 0xbc, 0x9a, 0x06, 0x71, 0xbb, 0xb2, 0x55, 0x14, 0x36, 0x24, 0x91,
+	0x55, 0x60, 0xd5, 0xa8, 0x40, 0x55, 0x6f, 0x35, 0xa9, 0x4f, 0xd4, 0x5b, 0x13, 0x0a, 0x38, 0x68,
+	0x83, 0xa2, 0x71, 0x20, 0x3e, 0x21, 0x8f, 0x08, 0xff, 0x94, 0x0e, 0x87, 0x33, 0x11, 0x0f, 0x7a,
+	0x0a, 0x4d, 0x49, 0xfc, 0x74, 0x4a, 0xa6, 0x44, 0x02, 0xeb, 0x80, 0xcd, 0xd3, 0xd9, 0x5b, 0x72,
+	0xe5, 0x5a, 0x78, 0x1e, 0x4d, 0x27, 0x3a, 0x42, 0xb1, 0x44, 0xcf, 0xa1, 0xa5, 0x90, 0x51, 0x45,
+	0x90, 0x4a, 0x62, 0xdf, 0x4f, 0xd2, 0xd9, 0x23, 0xd6, 0x8b, 0x92, 0x22, 0x96, 0x7c, 0x80, 0x96,
+	0xd2, 0x61, 0xf9, 0x5b, 0x0b, 0x1c, 0xd3, 0x31, 0x9d, 0x9c, 0x7b, 0x50, 0x7b, 0x25, 0x3c, 0xd3,
+	0x7d, 0xdf, 0x28, 0xc8, 0x79, 0xaf, 0xdd, 0x9c, 0xcd, 0xe9, 0x41, 0x6b, 0x78, 0xcd, 0x35, 0xf9,
+	0x29, 0x52, 0xdf, 0x7b, 0xa0, 0x44, 0xaf, 0x3b, 0xee, 0x2e, 0xf0, 0xa3, 0xdf, 0x58, 0xf2, 0x6d,
+	0x62, 0x72, 0x7e, 0xa3, 0xab, 0x7f, 0x00, 0x65, 0x1a, 0xc7, 0xf9, 0x57, 0xa4, 0xa6, 0x44, 0x16,
+	0x33, 0x12, 0x9e, 0xad, 0xc8, 0x62, 0x7d, 0x84, 0x7e, 0x65, 0xc9, 0x47, 0x8f, 0xe9, 0x8d, 0xc6,
+	0x67, 0x1b, 0x6a, 0xca, 0x77, 0xa1, 0x61, 0xf1, 0x83, 0x20, 0x3f, 0x94, 0x89, 0x2f, 0x92, 0xd8,
+	0xcf, 0xc6, 0x95, 0xa4, 0xee, 0x32, 0xab, 0x7f, 0x67, 0xc1, 0xc6, 0x27, 0x34, 0x88, 0x94, 0x1f,
+	0x12, 0xfb, 0x5b, 0x83, 0xf2, 0x10, 0xaa, 0x89, 0xae, 0x21, 0xfd, 0x79, 0x9d, 0xd1, 0x46, 0xd3,
+	0xb3, 0x57, 0x36, 0xbd, 0x4d, 0x28, 0xe1, 0xe0, 0xf9, 0x74, 0xa2, 0x4b, 0x45, 0x11, 0xe8, 0x4b,
+	0xb8, 0x7f, 0xcd, 0x21, 0x8d, 0xcb, 0x43, 0xa8, 0x5e, 0xe2, 0x80, 0xcb, 0xa9, 0xa2, 0x7c, 0xcb,
+	0xe8, 0xbb, 0xfc, 0xc3, 0xf1, 0x08, 0x5a, 0xf2, 0x59, 0xf1, 0xd6, 0x88, 0xd1, 0x3f, 0x2d, 0xa8,
+	0x9f, 0x60, 0xee, 0x8d, 0x15, 0x9b, 0xd3, 0x01, 0x50, 0xb8, 0xef, 0xe7, 0xd5, 0x60, 0xec, 0xac,
+	0xbc, 0x8a, 0xc5, 0xe9, 0x99, 0x61, 0x69, 0xaf, 0xc2, 0xb2, 0x74, 0x0d, 0xcb, 0x3c, 0xb8, 0xf2,
+	0x4d, 0xdd, 0xdc, 0xe8, 0xa0, 0x95, 0xd5, 0x1d, 0xf4, 0x4f, 0xd9, 0xd4, 0x50, 0xd1, 0xad, 0x1c,
+	0x71, 0xcb, 0xde, 0x03, 0x0e, 0xd8, 0xec, 0x3c, 0x88, 0xd2, 0x52, 0x10, 0xeb, 0xb9, 0x51, 0x68,
+	0xbf, 0x65, 0x14, 0xce, 0x0d, 0x8f, 0xd2, 0x5b, 0x86, 0x87, 0x7c, 0xb4, 0x98, 0x2e, 0x1a, 0x00,
+	0x5b, 0x73, 0x00, 0xb7, 0xa1, 0xc2, 0x38, 0x1e, 0x11, 0x8d, 0x7c, 0xc9, 0x4d, 0xc9, 0x1c, 0xe8,
+	0xa2, 0x09, 0xf4, 0x1e, 0x54, 0x94, 0x95, 0xf4, 0xc3, 0xa7, 0x6d, 0xce, 0x24, 0x13, 0x0f, 0x37,
+	0x65, 0x44, 0x43, 0xd8, 0x30, 0x8f, 0xc5, 0x37, 0xa7, 0x01, 0xb4, 0xb5, 0x12, 0xe8, 0xbb, 0xa4,
+	0xe5, 0xe7, 0x00, 0x79, 0xda, 0xaf, 0x8c, 0x76, 0x17, 0xca, 0xca, 0x29, 0x3d, 0xab, 0x57, 0x3b,
+	0xaf, 0xf9, 0xd0, 0x8f, 0xa1, 0xb1, 0xcf, 0x39, 0xce, 0x12, 0xf9, 0x56, 0x8e, 0x8b, 0x91, 0x72,
+	0x40, 0x72, 0x29, 0x74, 0x2c, 0xbe, 0x96, 0x3d, 0x7a, 0x21, 0x9e, 0x04, 0x52, 0xcd, 0x3b, 0x3f,
+	0x87, 0x90, 0x07, 0xad, 0x39, 0x55, 0xdf, 0x05, 0x9a, 0x3b, 0x03, 0xa8, 0x0f, 0xc6, 0x34, 0x3e,
+	0x61, 0x23, 0xf9, 0xb1, 0xbc, 0x01, 0x75, 0xe3, 0x4f, 0xd5, 0xd6, 0x9a, 0xd8, 0x30, 0xfe, 0x3b,
+	0x6d, 0x59, 0x4e, 0x0b, 0x1a, 0x29, 0xc7, 0x80, 0x84, 0x61, 0xab, 0x20, 0x76, 0x52, 0x16, 0xb9,
+	0x53, 0xdc, 0xf9, 0x3f, 0x80, 0x1e, 0x1e, 0xa5, 0x3a, 0xeb, 0x50, 0x11, 0xe7, 0x3d, 0x3c, 0x6a,
+	0xad, 0xed, 0x1c, 0x66, 0x7f, 0xb4, 0xc8, 0xcf, 0x45, 0x67, 0x53, 0x7d, 0x30, 0xa4, 0xf4, 0x61,
+	0x42, 0x88, 0xb6, 0xaa, 0x76, 0x0f, 0xa7, 0x61, 0xd8, 0xb2, 0x8c, 0x8d, 0x01, 0xa7, 0x71, 0xab,
+	0xd0, 0xfb, 0xd1, 0xeb, 0x37, 0x9d, 0xb5, 0x7f, 0xbc, 0xe9, 0xac, 0x7d, 0xfd, 0xa6, 0x63, 0xfd,
+	0xf2, 0xaa, 0x63, 0xfd, 0xf5, 0xaa, 0x63, 0xfd, 0xed, 0xaa, 0x63, 0xbd, 0xbe, 0xea, 0x58, 0xff,
+	0xba, 0xea, 0x58, 0xff, 0xb9, 0xea, 0xac, 0x7d, 0x7d, 0xd5, 0xb1, 0x7e, 0xff, 0xef, 0xce, 0xda,
+	0xb0, 0x2c, 0xff, 0x74, 0x7e, 0xff, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x9f, 0x26, 0x18, 0xb5,
+	0xcf, 0x16, 0x00, 0x00,
 }

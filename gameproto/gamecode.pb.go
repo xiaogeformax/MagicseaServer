@@ -7,13 +7,43 @@ Package gameproto is a generated protocol buffer package.
 
 It is generated from these files:
 	gamecode.proto
+	gamemsg.proto
 	login.proto
 	share.proto
 
 It has these top-level messages:
+	C2S_PrivateChatMsg
+	S2C_PrivateChatMsg
+	S2C_PrivateOtherChatMsg
+	C2S_WorldChatMsg
+	S2C_WorldChatMsg
+	S_ReviseUserInfo
+	C_Response
+	C_UpateAttr
+	S_RequestBattle
+	C_RequestBattle
+	C_StartBattle
+	C_Balance
+	Award
+	FVector
+	Move
+	Shot
+	UseItem
+	FighterSnapInfo
+	Snap
+	FighterInfo
+	BattleStart
+	NewStage
+	GameOver
+	Hit
+	AddHP
+	Dead
+	AddEntity
+	RemoveEntity
 	UserLoginResult
 	PlatformUser
 	LoginReturn
+	LoginInfo
 	C2S_TestMsg
 	S2C_TestMsg
 	S2C_ConfirmInfo

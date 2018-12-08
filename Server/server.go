@@ -7,6 +7,10 @@ import (
 	"MagicseaServer/GAServer/app"
 	"MagicseaServer/Server/center"
 	"MagicseaServer/Server/login"
+	"MagicseaServer/Server/db"
+	"MagicseaServer/Server/cluster"
+	"MagicseaServer/Server/gate"
+	"MagicseaServer/Server/session"
 )
 
 var (
@@ -23,8 +27,11 @@ func main(){
 	}
 
 	app.RegisterService(center.Type(), center.Service)
+	app.RegisterService(session.Type(), session.Service)
 	app.RegisterService(login.Type(), login.Service)
+	app.RegisterService(gate.Type(), gate.Service)
+
 	log.Println("===Run===", conf)
-	app.Run(&conf.Base)
+	app.Run(&conf.Base, cluster.New(), db.NewRedisMgr())
 }
 

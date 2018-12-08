@@ -51,7 +51,7 @@ func (s *ActorService) Receive(context actor.Context) {
 		s.serviceIns.OnReceive(context.(Context))
 		fun := s.rounter[reflect.TypeOf(msg)]
 		if fun != nil {
-			fun(context.(Context))
+		 	fun(context.(Context))
 		}
 	}
 }

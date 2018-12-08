@@ -6,11 +6,13 @@ import (
 	"MagicseaServer/gameproto/msgs"
 	"MagicseaServer/GAServer/log"
 	"github.com/golang/protobuf/proto"
+	gp "github.com/magicsea/ganet/proto"
 	"errors"
 	"MagicseaServer/gameproto"
 
 	"MagicseaServer/Server/cluster"
 	"time"
+	"MagicseaServer/GAServer/config"
 )
 type AgentActor struct {
 	key string
@@ -62,7 +64,11 @@ func (ab *AgentActor) Receive(context actor.Context) {
 	}
 }
 
-func (ab *AgentActor) GetChannelServer(channel msgs.ChannelType) *actor.PID {
+func (ab *AgentActor) GetNetPack() NetPack {
+	return GetNetPackByConf()
+}
+
+func (ab *AgentActor) GetChannelServer(channel int) *actor.PID {
 	c := msgs.ChannelType(int(channel) / 100 * 100) //简单对应
 	//log.Info("GetChannelServer,%v,%v", channel, c)
 	if ab.bindServers == nil {
@@ -80,33 +86,41 @@ func (ab *AgentActor) GetChannelServer(channel msgs.ChannelType) *actor.PID {
 
 //收到前端消息
 func (ab *AgentActor) ReceviceClientMsg(data []byte) error {
-	pack := new(NetPack)
-	if !pack.Read(data) {
-		log.Error("AgentActor recv too short:", data)
+	pack := ab.GetNetPack()
+
+	msgId, rawdata, err := pack.Unmarshal(data)
+	if msgId != "b_move" {
+		log.Info("recv:%v", msgId)
+	}
+
+	if err != nil {
+		log.Error("pack.Unmarshal error:%v,%v", data, err)
 		return errors.New("AgentActor recv too short")
 	}
+
+
 	//心跳包
-	channel := msgs.ChannelType(pack.channel)
-	if channel == msgs.Heartbeat {
-		ab.SendClientPack(pack)
+	channel := pack.GetChannelType(msgId)
+	if channel ==ChannelHeartbeat {
+		ab.SendClientPack(msgId, rawdata)
 		return nil
 	}
 	//认证
 	if !ab.verified {
-		return ab.CheckLogin(pack)
+		return ab.CheckLogin(msgId, rawdata)
 	}
 
 	//转发
-	return ab.forward(pack)
+	return ab.forward(msgId, rawdata, channel)
 }
 
 //验证消息
-func (ab *AgentActor) CheckLogin(pack *NetPack) error {
+func (ab *AgentActor) CheckLogin(msgId interface{}, rawdata []byte) error {
 	log.Info("checklogin....")
 	msg := gameproto.PlatformUser{}
-	err := proto.Unmarshal(pack.rawData, &msg)
+	err := proto.Unmarshal(rawdata, &msg)
 	if err != nil {
-		log.Error("CheckLogin fail:%v,msgid:%d", err, pack.msgID)
+		log.Error("CheckLogin fail:%v,msgid:%v", err, msgId)
 		return err
 	}
 
@@ -130,7 +144,7 @@ func (ab *AgentActor) CheckLogin(pack *NetPack) error {
 		}
 
 		ret := &gameproto.LoginReturn{ErrCode: int32(checkResult.Result), ServerTime: int32(time.Now().Unix())}
-		ab.SendClient(msgs.Login, byte(gameproto.S2C_LOGIN_END), ret)
+		ab.SendClient(msgId,ret)
 
 	} else {
 		log.Error("CheckLogin error :" + err.Error())
@@ -139,43 +153,56 @@ func (ab *AgentActor) CheckLogin(pack *NetPack) error {
 	return nil
 }
 //发送消息到客户端
-func (ab *AgentActor) SendClient(c msgs.ChannelType, msgId byte, msg proto.Message) {
-	pack := new(NetPack)
-	pack.channel = c
-	pack.msgID = msgId
-	mdata, err := proto.Marshal(msg)
+func (ab *AgentActor) SendClient(msgId interface{},  msg proto.Message ) {
+	mdata, err := gp.Marshal(msg)
 	if err != nil {
 		log.Error("SendClient marshal error:%v", err)
 		return
 	}
-	pack.rawData = mdata
 	//log.Info("sendclient:msg%v,data:%d=>%v", pack.msgID, len(pack.rawData), pack.rawData)
-	ab.SendClientPack(pack)
+	ab.SendClientPack(msgId, mdata)
+
 }
 
-func (ab *AgentActor) SendClientPack(pack *NetPack) {
-	data := pack.Write()
+func (ab *AgentActor) SendClientPack(msgId interface{}, rawdata []byte) {
+	var pack = ab.GetNetPack()
+	data, err := pack.Marshal(msgId, rawdata)
+	if err != nil {
+		log.Error("SendClientPack marshal error:id=%v,%s", msgId, err.Error())
+		return
+	}
 	ab.bindAgent.WriteMsg(data)
 }
 
 //转发
-func (ab *AgentActor) forward(pack *NetPack) error {
-	channel := pack.channel
-	msgid := pack.msgID
+func (ab *AgentActor)  forward(msgId interface{}, rawdata []byte, channel ChannelType) error {
+	//channel := pack.channel
+	//msgid := pack.msgID
 	//test gate
 	//if channel == byte(msgs.Shop) {
 	//	ab.SendClient(msgs.Shop, byte(msgs.S2C_ShopBuy), &msgs.S2C_ShopBuyMsg{ItemId: 1, Result: msgs.OK})
 	//	return nil
 	//}
 
-	pid := ab.GetChannelServer(channel)
-	if pid == nil {
-		log.Error("forward server nil:%+v,c=%v,m=%v", pid, channel, msgid)
-		return nil
+	if msgId != "b_move" {
+		log.Info("=========>forward msg:%v", msgId)
 	}
 
-	frame := &msgs.FrameMsg{channel, uint32(msgid), pack.rawData}
-	pid.Tell(frame)
+	pid := ab.GetChannelServer(int(channel))
+	if pid == nil {
+		log.Error("forward server nil:%+v,c=%v,m=%v", pid, channel, msgId)
+		return nil
+	}
+	if config.IsJsonProto() {
+		frame := &msgs.FrameMsgJson{MsgId: msgId.(string), RawData: rawdata, Uid: ab.baseInfo.Uid}
+		pid.Request(frame, ab.pid)
+	} else {
+		frame := &msgs.FrameMsg{MsgId: uint32(msgId.(byte)), RawData: rawdata, Uid: ab.baseInfo.Uid}
+		pid.Request(frame, ab.pid)
+	}
+
+	//frame := &msgs.FrameMsg{channel, uint32(msgid), pack.rawData}
+	//pid.Tell(frame)
 	//r, e := pid.RequestFuture(frame, time.Second*3).Result()
 	//if e != nil {
 	//	log.Error("forward error:id=%v, err=%v", ab.baseInfo.Uid, e)

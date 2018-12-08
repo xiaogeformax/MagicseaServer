@@ -3,6 +3,12 @@
 	"db":{
 			"game":"root:tcg123456@tcp(192.168.3.194:3306)/tcg_new"
 	},
+	"redis":{
+		"addr":"127.0.0.1:6379",
+		"password":"",
+		"poolsize":10,
+		"dbs":[0,1,2,3,4]
+	},
 	"design":{
 		"path":"../config/csv/"
 	},
@@ -31,6 +37,11 @@
 					"serviceName":"center",
 					"serviceType":"center",
 					"remoteAddr":"127.0.0.1:8090"
+			},
+			"session":{
+				"serviceName":"session",
+				"serviceType":"session",
+				"remoteAddr":""
 			}
 		}
 	}	

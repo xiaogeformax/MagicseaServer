@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"MagicseaServer/GAServer/config"
 	"MagicseaServer/GAServer/log"
-	"strings"
+
 	"strconv"
 	"MagicseaServer/Server/cluster"
 	"MagicseaServer/gameproto/msgs"
 	"MagicseaServer/gameproto"
 	"github.com/gogo/protobuf/proto"
+	"MagicseaServer/Server/db"
+	"time"
 )
 
 type LoginService struct{
@@ -73,8 +75,29 @@ func regist(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	log.Info("reg account:acc=%s,pwd=%s", acc, pwd)
-	//key := "User:nameindex:" + acc
-	//todo db
+	key := "User:nameindex:" + acc
+	r := db.GetRedisGame().Get(key).Val()
+	if len(r) > 0 {
+		registBackError(w, "已经存在的账号", nil)
+		return
+	}
+
+	//插入
+	gamedb := db.GetRedisGame()
+	id, err2 := gamedb.Incr("User:Id").Result()
+	if err2 != nil {
+		registBackError(w, "数据插入id出错", err2)
+		return
+	}
+	var user = &db.User{Id: id, Account: acc, Password: pwd, RegisterTime: time.Now().Unix()}
+	if err := db.SetRedisObject(user, id, gamedb); err != nil {
+		registBackError(w, "数据插入出错", err)
+		return
+	}
+
+	//设置索引
+	db.GetRedisGame().Set(key, id, 0)
+
 	w.Write([]byte("success"))
 
 }
@@ -95,24 +118,96 @@ func login(w http.ResponseWriter, req *http.Request) {
 	if al, ok := req.Form["a"]; ok {
 		acc = al[0]
 	}
-	log.Println("login account:", acc)
-	strs := strings.Split(acc, "_")
- 	id, _ := strconv.Atoi(strs[0])
 
-	resp, err := cluster.GetServicePID("session").Ask(&msgs.UserLogin{acc, uint64(id)})
+	pwd := ""
+	if pl, ok := req.Form["p"]; ok {
+		pwd = pl[0]
+	}
+
+	log.Info("login account:acc=%s,pwd=%s", acc, pwd)
+
+	gamedb := db.GetRedisGame()
+
+	//索引
+	key := "User:nameindex:" + acc
+	r, err := db.GetRedisGame().Get(key).Result()
+
+	if err != nil {
+		loginBackError(w, "get username error:"+key, err)
+		return
+	}
+	if len(r) < 1 {
+		loginBackError(w, "username not exist:"+key, nil)
+		return
+	}
+
+	//账号密码
+	now := time.Now().Unix()
+	user := &db.User{}
+	found, e := db.GetRedisObject(user, r, gamedb)
+	if e != nil && !found {
+		loginBackError(w, "not found user:"+r, e)
+		return
+	}
+	if user.Password != pwd {
+		loginBackError(w, "password error:"+user.Password+"!="+pwd, nil)
+		return
+	}
+
+	//保存
+	db.SetRedisObjectField(user, r, gamedb, "LastLoginTime", now)
+	id, _ := strconv.Atoi(r)
+
+	//保存token
+
+	resp, err := OnUserLogin(uint64(id))
 	if err == nil {
-		var s, _ = resp.(*gameproto.UserLoginResult).Marshal()
-		//var s, _ = json.Marshal(resp)
+		var s, _ = proto.Marshal(resp)
 		w.Write(s)
-		log.Info("login ok:msg=%v", resp)
+		log.Info("login ok:msg=%+v", resp)
 	} else {
-		loginBackError(w, err)
-		log.Println("login error:", acc, err)
+		loginBackError(w, "login error", err)
+		log.Info("login error:", acc, err)
 	}
 }
+//玩家登陆
+func OnUserLogin(id uint64) (*gameproto.UserLoginResult, error) {
+	//请求gate
+	result, err := cluster.GetServicePID("center").Ask(&msgs.ApplyService{"gate"})
+	if err != nil {
+		return nil, err
+	}
 
-func loginBackError(w http.ResponseWriter, e error) {
-	log.Error("create user db :%v", e)
+	sr := result.(*msgs.ApplyServiceResult)
+	if sr.Result != msgs.OK {
+		return &gameproto.UserLoginResult{Result: int32(sr.Result)}, nil
+	}
+
+	//加入数据
+	key := "1111"
+	//uInfo := &msgs.UserBaseInfo{msg.Account, "玩家" + strconv.Itoa(int(msg.Uid)), msg.Uid}
+	//ss := &PlayerSession{userInfo: uInfo, gatePid: sr.Pid, key: "1111"}
+	//s.sessionMgr.AddSession(ss)
+	//s.unlogiinDataMgr.Push(msg.Uid, key, nil)
+	tokenkey := fmt.Sprintf("UserToken:%v_%v", id, key)
+	db.GetRedisGame().Set(tokenkey, key, time.Second*30)
+
+	gateAddr := GetServiceValue("TcpAddr", sr.Values)
+	gateWsAddr := GetServiceValue("WsAddr", sr.Values)
+	return &gameproto.UserLoginResult{Uid: uint32(id), GateTcpAddr: gateAddr, GateWsAddr: gateWsAddr, Key: key, Result: int32(msgs.OK)}, nil
+}
+
+func GetServiceValue(key string, values []*msgs.ServiceValue) string {
+	for _, v := range values {
+		if v.Key == key {
+			return v.Value
+		}
+	}
+	return ""
+}
+
+func loginBackError(w http.ResponseWriter,info string, e error) {
+	log.Error("create user db :%v",info, e)
 	d, _ := proto.Marshal(&gameproto.UserLoginResult{Result: int32(msgs.Error)})
 	w.Write(d)
 }

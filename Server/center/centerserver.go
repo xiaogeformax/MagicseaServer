@@ -9,7 +9,7 @@ import(
 )
 
 
-type CenterService struct{
+type CenterService struct {
 	service.ServiceData
 	serviceGroups map[string]*ServiceGroup //所有服务 map[type]group
 	serviceAll    map[string]*ServiceNode  //索引服务路径引用 map[addr+id]group
@@ -30,12 +30,13 @@ func (s *CenterService) OnReceive(context service.Context) {
 
 }
 
-func (s *CenterService) OnInit(){
+func (s *CenterService) OnInit() {
 	s.serviceGroups = make(map[string]*ServiceGroup)
 	s.serviceAll = make(map[string]*ServiceNode)
 }
 
-func (s *CenterService) OnStart(as *service.ActorService){
+func (s *CenterService) OnStart(as *service.ActorService) {
+	//as.RegisterMsg(reflect.TypeOf(&msgs.RemoveService{}), s.OnRemoveService)  //解注册服务器
 	as.RegisterMsg(reflect.TypeOf(&msgs.AddService{}), s.OnAddService)              //注册服务器
 	as.RegisterMsg(reflect.TypeOf(&actor.Terminated{}), s.OnChildServiceTerminated) //被动断开服务器
 	as.RegisterMsg(reflect.TypeOf(&msgs.UploadService{}), s.OnUpdateService)        //更新服务器
@@ -45,14 +46,15 @@ func (s *CenterService) OnStart(as *service.ActorService){
 
 //注册服务器
 func (s *CenterService) OnAddService(context service.Context) {
-	log.Println("center.OnAddService:", context.Message())
+
 	msg := context.Message().(*msgs.AddService)
+	log.Info("center.OnAddService:%s,pid=%s,%+v", msg.ServiceName, msg.Pid.String(), msg.Values)
 	var group *ServiceGroup
 	if g, ok := s.serviceGroups[msg.ServiceType]; !ok {
 		group = new(ServiceGroup)
 		group.services = make(map[string]*ServiceNode)
 		s.serviceGroups[msg.ServiceType] = group
-		log.Println("new service Type:", msg.ServiceType)
+		log.Info("new service Type:%v", msg.ServiceType)
 	} else {
 		group = g
 	}
@@ -68,13 +70,13 @@ func (s *CenterService) OnAddService(context service.Context) {
 	group.AddService(node)                 //加入group
 	context.Watch(node.pid)                //监控
 
-	context.Tell(context.Sender(), &msgs.SendOK{})
-	log.Println("center.OnAddService  OK,", msg.ServiceName)
+	context.Request(context.Sender(), &msgs.AddService{})
+	log.Info("center.OnAddService  OK:%s", msg.ServiceName)
 }
 
 //解注册服务器
 func (s *CenterService) __OnRemoveService(context service.Context) {
-	log.Println("center.OnRemoveService:", context.Message())
+	log.Info("center.OnRemoveService:%+v", context.Message())
 	msg := context.Message().(*msgs.RemoveService)
 
 	var group *ServiceGroup
@@ -89,10 +91,10 @@ func (s *CenterService) __OnRemoveService(context service.Context) {
 
 //被动断开服务器
 func (s *CenterService) OnChildServiceTerminated(context service.Context) {
-	log.Println("center.OnChildServiceTerminated:", context.Message())
+	log.Info("center.OnChildServiceTerminated:%+v", context.Message())
 
 	msg := context.Message().(*actor.Terminated)
-	//context.Unwatch(msg.Who)//需要主动unwatch???
+	//context.Unwatch(msg.Who) //需要主动unwatch???
 	path := msg.Who.String()
 
 	sv := s.serviceAll[path]
@@ -129,7 +131,7 @@ func (s *CenterService) OnApplyService(context service.Context) {
 	msg := context.Message().(*msgs.ApplyService)
 	var group *ServiceGroup
 	if g, ok := s.serviceGroups[msg.ServiceType]; !ok {
-		log.Error("OnApplyService,no found service Type:%v", msg.ServiceType)
+ 		log.Error("OnApplyService,no found service Type:%v", msg.ServiceType)
 		context.Sender().Tell(&msgs.ApplyServiceResult{Result: msgs.Error})
 		return
 	} else {

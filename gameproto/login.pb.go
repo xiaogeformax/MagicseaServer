@@ -42,10 +42,11 @@ func (PlatformUser_PlatformType) EnumDescriptor() ([]byte, []int) {
 
 // http登录结果
 type UserLoginResult struct {
-	Uid      uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	GateAddr string `protobuf:"bytes,2,opt,name=gateAddr,proto3" json:"gateAddr,omitempty"`
-	Key      string `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
-	Result   int32  `protobuf:"varint,4,opt,name=result,proto3" json:"result,omitempty"`
+	Uid         uint32 `protobuf:"varint,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	GateTcpAddr string `protobuf:"bytes,2,opt,name=gateTcpAddr,proto3" json:"gateTcpAddr,omitempty"`
+	GateWsAddr  string `protobuf:"bytes,3,opt,name=gateWsAddr,proto3" json:"gateWsAddr,omitempty"`
+	Key         string `protobuf:"bytes,4,opt,name=key,proto3" json:"key,omitempty"`
+	Result      int32  `protobuf:"varint,5,opt,name=result,proto3" json:"result,omitempty"`
 }
 
 func (m *UserLoginResult) Reset()                    { *m = UserLoginResult{} }
@@ -59,9 +60,16 @@ func (m *UserLoginResult) GetUid() uint32 {
 	return 0
 }
 
-func (m *UserLoginResult) GetGateAddr() string {
+func (m *UserLoginResult) GetGateTcpAddr() string {
 	if m != nil {
-		return m.GateAddr
+		return m.GateTcpAddr
+	}
+	return ""
+}
+
+func (m *UserLoginResult) GetGateWsAddr() string {
+	if m != nil {
+		return m.GateWsAddr
 	}
 	return ""
 }
@@ -190,10 +198,82 @@ func (m *LoginReturn) GetBFirst() int32 {
 	return 0
 }
 
+type LoginInfo struct {
+	HeadId   int32  `protobuf:"varint,1,opt,name=headId,proto3" json:"headId,omitempty"`
+	Level    int32  `protobuf:"varint,2,opt,name=level,proto3" json:"level,omitempty"`
+	Exp      int64  `protobuf:"varint,3,opt,name=exp,proto3" json:"exp,omitempty"`
+	Nickname string `protobuf:"bytes,4,opt,name=nickname,proto3" json:"nickname,omitempty"`
+	Sex      int32  `protobuf:"varint,5,opt,name=sex,proto3" json:"sex,omitempty"`
+	Id       int64  `protobuf:"varint,6,opt,name=id,proto3" json:"id,omitempty"`
+	Gold     int32  `protobuf:"varint,7,opt,name=gold,proto3" json:"gold,omitempty"`
+	Diamond  int32  `protobuf:"varint,8,opt,name=diamond,proto3" json:"diamond,omitempty"`
+}
+
+func (m *LoginInfo) Reset()                    { *m = LoginInfo{} }
+func (*LoginInfo) ProtoMessage()               {}
+func (*LoginInfo) Descriptor() ([]byte, []int) { return fileDescriptorLogin, []int{3} }
+
+func (m *LoginInfo) GetHeadId() int32 {
+	if m != nil {
+		return m.HeadId
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetLevel() int32 {
+	if m != nil {
+		return m.Level
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetExp() int64 {
+	if m != nil {
+		return m.Exp
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetNickname() string {
+	if m != nil {
+		return m.Nickname
+	}
+	return ""
+}
+
+func (m *LoginInfo) GetSex() int32 {
+	if m != nil {
+		return m.Sex
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetId() int64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetGold() int32 {
+	if m != nil {
+		return m.Gold
+	}
+	return 0
+}
+
+func (m *LoginInfo) GetDiamond() int32 {
+	if m != nil {
+		return m.Diamond
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*UserLoginResult)(nil), "gameproto.UserLoginResult")
 	proto.RegisterType((*PlatformUser)(nil), "gameproto.PlatformUser")
 	proto.RegisterType((*LoginReturn)(nil), "gameproto.LoginReturn")
+	proto.RegisterType((*LoginInfo)(nil), "gameproto.LoginInfo")
 	proto.RegisterEnum("gameproto.PlatformUser_PlatformType", PlatformUser_PlatformType_name, PlatformUser_PlatformType_value)
 }
 func (x PlatformUser_PlatformType) String() string {
@@ -231,7 +311,10 @@ func (this *UserLoginResult) Equal(that interface{}) bool {
 	if this.Uid != that1.Uid {
 		return false
 	}
-	if this.GateAddr != that1.GateAddr {
+	if this.GateTcpAddr != that1.GateTcpAddr {
+		return false
+	}
+	if this.GateWsAddr != that1.GateWsAddr {
 		return false
 	}
 	if this.Key != that1.Key {
@@ -332,14 +415,66 @@ func (this *LoginReturn) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *LoginInfo) Equal(that interface{}) bool {
+	if that == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	}
+
+	that1, ok := that.(*LoginInfo)
+	if !ok {
+		that2, ok := that.(LoginInfo)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		if this == nil {
+			return true
+		}
+		return false
+	} else if this == nil {
+		return false
+	}
+	if this.HeadId != that1.HeadId {
+		return false
+	}
+	if this.Level != that1.Level {
+		return false
+	}
+	if this.Exp != that1.Exp {
+		return false
+	}
+	if this.Nickname != that1.Nickname {
+		return false
+	}
+	if this.Sex != that1.Sex {
+		return false
+	}
+	if this.Id != that1.Id {
+		return false
+	}
+	if this.Gold != that1.Gold {
+		return false
+	}
+	if this.Diamond != that1.Diamond {
+		return false
+	}
+	return true
+}
 func (this *UserLoginResult) GoString() string {
 	if this == nil {
 		return "nil"
 	}
-	s := make([]string, 0, 8)
+	s := make([]string, 0, 9)
 	s = append(s, "&gameproto.UserLoginResult{")
 	s = append(s, "Uid: "+fmt.Sprintf("%#v", this.Uid)+",\n")
-	s = append(s, "GateAddr: "+fmt.Sprintf("%#v", this.GateAddr)+",\n")
+	s = append(s, "GateTcpAddr: "+fmt.Sprintf("%#v", this.GateTcpAddr)+",\n")
+	s = append(s, "GateWsAddr: "+fmt.Sprintf("%#v", this.GateWsAddr)+",\n")
 	s = append(s, "Key: "+fmt.Sprintf("%#v", this.Key)+",\n")
 	s = append(s, "Result: "+fmt.Sprintf("%#v", this.Result)+",\n")
 	s = append(s, "}")
@@ -375,6 +510,23 @@ func (this *LoginReturn) GoString() string {
 	s = append(s, "}")
 	return strings.Join(s, "")
 }
+func (this *LoginInfo) GoString() string {
+	if this == nil {
+		return "nil"
+	}
+	s := make([]string, 0, 12)
+	s = append(s, "&gameproto.LoginInfo{")
+	s = append(s, "HeadId: "+fmt.Sprintf("%#v", this.HeadId)+",\n")
+	s = append(s, "Level: "+fmt.Sprintf("%#v", this.Level)+",\n")
+	s = append(s, "Exp: "+fmt.Sprintf("%#v", this.Exp)+",\n")
+	s = append(s, "Nickname: "+fmt.Sprintf("%#v", this.Nickname)+",\n")
+	s = append(s, "Sex: "+fmt.Sprintf("%#v", this.Sex)+",\n")
+	s = append(s, "Id: "+fmt.Sprintf("%#v", this.Id)+",\n")
+	s = append(s, "Gold: "+fmt.Sprintf("%#v", this.Gold)+",\n")
+	s = append(s, "Diamond: "+fmt.Sprintf("%#v", this.Diamond)+",\n")
+	s = append(s, "}")
+	return strings.Join(s, "")
+}
 func valueToGoStringLogin(v interface{}, typ string) string {
 	rv := reflect.ValueOf(v)
 	if rv.IsNil() {
@@ -403,20 +555,26 @@ func (m *UserLoginResult) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintLogin(dAtA, i, uint64(m.Uid))
 	}
-	if len(m.GateAddr) > 0 {
+	if len(m.GateTcpAddr) > 0 {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintLogin(dAtA, i, uint64(len(m.GateAddr)))
-		i += copy(dAtA[i:], m.GateAddr)
+		i = encodeVarintLogin(dAtA, i, uint64(len(m.GateTcpAddr)))
+		i += copy(dAtA[i:], m.GateTcpAddr)
+	}
+	if len(m.GateWsAddr) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(len(m.GateWsAddr)))
+		i += copy(dAtA[i:], m.GateWsAddr)
 	}
 	if len(m.Key) > 0 {
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 		i++
 		i = encodeVarintLogin(dAtA, i, uint64(len(m.Key)))
 		i += copy(dAtA[i:], m.Key)
 	}
 	if m.Result != 0 {
-		dAtA[i] = 0x20
+		dAtA[i] = 0x28
 		i++
 		i = encodeVarintLogin(dAtA, i, uint64(m.Result))
 	}
@@ -524,6 +682,65 @@ func (m *LoginReturn) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *LoginInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LoginInfo) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.HeadId != 0 {
+		dAtA[i] = 0x8
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.HeadId))
+	}
+	if m.Level != 0 {
+		dAtA[i] = 0x10
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Level))
+	}
+	if m.Exp != 0 {
+		dAtA[i] = 0x18
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Exp))
+	}
+	if len(m.Nickname) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(len(m.Nickname)))
+		i += copy(dAtA[i:], m.Nickname)
+	}
+	if m.Sex != 0 {
+		dAtA[i] = 0x28
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Sex))
+	}
+	if m.Id != 0 {
+		dAtA[i] = 0x30
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Id))
+	}
+	if m.Gold != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Gold))
+	}
+	if m.Diamond != 0 {
+		dAtA[i] = 0x40
+		i++
+		i = encodeVarintLogin(dAtA, i, uint64(m.Diamond))
+	}
+	return i, nil
+}
+
 func encodeFixed64Login(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
@@ -557,7 +774,11 @@ func (m *UserLoginResult) Size() (n int) {
 	if m.Uid != 0 {
 		n += 1 + sovLogin(uint64(m.Uid))
 	}
-	l = len(m.GateAddr)
+	l = len(m.GateTcpAddr)
+	if l > 0 {
+		n += 1 + l + sovLogin(uint64(l))
+	}
+	l = len(m.GateWsAddr)
 	if l > 0 {
 		n += 1 + l + sovLogin(uint64(l))
 	}
@@ -624,6 +845,37 @@ func (m *LoginReturn) Size() (n int) {
 	return n
 }
 
+func (m *LoginInfo) Size() (n int) {
+	var l int
+	_ = l
+	if m.HeadId != 0 {
+		n += 1 + sovLogin(uint64(m.HeadId))
+	}
+	if m.Level != 0 {
+		n += 1 + sovLogin(uint64(m.Level))
+	}
+	if m.Exp != 0 {
+		n += 1 + sovLogin(uint64(m.Exp))
+	}
+	l = len(m.Nickname)
+	if l > 0 {
+		n += 1 + l + sovLogin(uint64(l))
+	}
+	if m.Sex != 0 {
+		n += 1 + sovLogin(uint64(m.Sex))
+	}
+	if m.Id != 0 {
+		n += 1 + sovLogin(uint64(m.Id))
+	}
+	if m.Gold != 0 {
+		n += 1 + sovLogin(uint64(m.Gold))
+	}
+	if m.Diamond != 0 {
+		n += 1 + sovLogin(uint64(m.Diamond))
+	}
+	return n
+}
+
 func sovLogin(x uint64) (n int) {
 	for {
 		n++
@@ -643,7 +895,8 @@ func (this *UserLoginResult) String() string {
 	}
 	s := strings.Join([]string{`&UserLoginResult{`,
 		`Uid:` + fmt.Sprintf("%v", this.Uid) + `,`,
-		`GateAddr:` + fmt.Sprintf("%v", this.GateAddr) + `,`,
+		`GateTcpAddr:` + fmt.Sprintf("%v", this.GateTcpAddr) + `,`,
+		`GateWsAddr:` + fmt.Sprintf("%v", this.GateWsAddr) + `,`,
 		`Key:` + fmt.Sprintf("%v", this.Key) + `,`,
 		`Result:` + fmt.Sprintf("%v", this.Result) + `,`,
 		`}`,
@@ -676,6 +929,23 @@ func (this *LoginReturn) String() string {
 		`ServerTime:` + fmt.Sprintf("%v", this.ServerTime) + `,`,
 		`Args:` + fmt.Sprintf("%v", this.Args) + `,`,
 		`BFirst:` + fmt.Sprintf("%v", this.BFirst) + `,`,
+		`}`,
+	}, "")
+	return s
+}
+func (this *LoginInfo) String() string {
+	if this == nil {
+		return "nil"
+	}
+	s := strings.Join([]string{`&LoginInfo{`,
+		`HeadId:` + fmt.Sprintf("%v", this.HeadId) + `,`,
+		`Level:` + fmt.Sprintf("%v", this.Level) + `,`,
+		`Exp:` + fmt.Sprintf("%v", this.Exp) + `,`,
+		`Nickname:` + fmt.Sprintf("%v", this.Nickname) + `,`,
+		`Sex:` + fmt.Sprintf("%v", this.Sex) + `,`,
+		`Id:` + fmt.Sprintf("%v", this.Id) + `,`,
+		`Gold:` + fmt.Sprintf("%v", this.Gold) + `,`,
+		`Diamond:` + fmt.Sprintf("%v", this.Diamond) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -738,7 +1008,7 @@ func (m *UserLoginResult) Unmarshal(dAtA []byte) error {
 			}
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field GateAddr", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field GateTcpAddr", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -763,9 +1033,38 @@ func (m *UserLoginResult) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.GateAddr = string(dAtA[iNdEx:postIndex])
+			m.GateTcpAddr = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GateWsAddr", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLogin
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GateWsAddr = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Key", wireType)
 			}
@@ -794,7 +1093,7 @@ func (m *UserLoginResult) Unmarshal(dAtA []byte) error {
 			}
 			m.Key = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
@@ -1212,6 +1511,218 @@ func (m *LoginReturn) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *LoginInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowLogin
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LoginInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LoginInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HeadId", wireType)
+			}
+			m.HeadId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.HeadId |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Level", wireType)
+			}
+			m.Level = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Level |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exp", wireType)
+			}
+			m.Exp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Exp |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nickname", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLogin
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Nickname = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sex", wireType)
+			}
+			m.Sex = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Sex |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Gold", wireType)
+			}
+			m.Gold = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Gold |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Diamond", wireType)
+			}
+			m.Diamond = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLogin
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Diamond |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipLogin(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthLogin
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipLogin(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1320,30 +1831,37 @@ var (
 func init() { proto.RegisterFile("login.proto", fileDescriptorLogin) }
 
 var fileDescriptorLogin = []byte{
-	// 395 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x91, 0xc1, 0x6e, 0xda, 0x30,
-	0x1c, 0xc6, 0x63, 0x20, 0x81, 0xfc, 0xd9, 0x06, 0xf2, 0x61, 0x8a, 0xa6, 0xc9, 0x8a, 0xa2, 0x69,
-	0xca, 0x61, 0xe2, 0xb0, 0xbd, 0xc0, 0x36, 0x60, 0x52, 0xa4, 0x1d, 0x26, 0x0f, 0x7a, 0x0f, 0xc4,
-	0x4d, 0xad, 0x86, 0x04, 0xd9, 0x01, 0x89, 0x5b, 0x1f, 0xa1, 0x8f, 0xd1, 0x47, 0xa9, 0x7a, 0xe2,
-	0xd8, 0x63, 0x49, 0x2f, 0x3d, 0xf2, 0x08, 0x95, 0x4d, 0x12, 0xa2, 0xde, 0xbe, 0xdf, 0xe7, 0xd8,
-	0xdf, 0x3f, 0xdf, 0x1f, 0xfa, 0x49, 0x16, 0xf3, 0x74, 0xb4, 0x16, 0x59, 0x9e, 0x61, 0x3b, 0x0e,
-	0x57, 0x4c, 0x4b, 0x8f, 0xc3, 0x60, 0x2e, 0x99, 0xf8, 0xab, 0x4e, 0x29, 0x93, 0x9b, 0x24, 0xc7,
-	0x43, 0x68, 0x6f, 0x78, 0xe4, 0x20, 0x17, 0xf9, 0xef, 0xa9, 0x92, 0xf8, 0x13, 0xf4, 0xe2, 0x30,
-	0x67, 0xbf, 0xa2, 0x48, 0x38, 0x2d, 0x17, 0xf9, 0x36, 0xad, 0x59, 0x7d, 0x7d, 0xcd, 0x76, 0x4e,
-	0x5b, 0xdb, 0x4a, 0xe2, 0x8f, 0x60, 0x09, 0xfd, 0x92, 0xd3, 0x71, 0x91, 0x6f, 0xd2, 0x92, 0xbc,
-	0x87, 0x16, 0xbc, 0xfb, 0x97, 0x84, 0xf9, 0x65, 0x26, 0x56, 0x2a, 0x13, 0x13, 0x80, 0x75, 0xc9,
-	0xc1, 0x29, 0xcf, 0xa6, 0x0d, 0x07, 0xff, 0x84, 0x5e, 0x45, 0x3a, 0xf6, 0xc3, 0xf7, 0x2f, 0xa3,
-	0x7a, 0xf2, 0x51, 0xf3, 0xa9, 0x1a, 0x66, 0xbb, 0x35, 0xa3, 0xf5, 0x2d, 0xec, 0xc3, 0xa0, 0xd2,
-	0xff, 0x99, 0x94, 0x3c, 0x4b, 0xcb, 0x41, 0xdf, 0xda, 0xd8, 0x85, 0x7e, 0x65, 0xcd, 0x79, 0x54,
-	0x4e, 0xde, 0xb4, 0x54, 0x09, 0x92, 0x89, 0x2d, 0x13, 0xc1, 0xc4, 0x31, 0xf5, 0x71, 0xcd, 0xf8,
-	0x33, 0xd8, 0xcb, 0xab, 0x30, 0x4d, 0x59, 0x12, 0x44, 0x8e, 0xa5, 0x13, 0xce, 0x06, 0x76, 0xa0,
-	0xbb, 0x65, 0x42, 0xa7, 0x77, 0xf5, 0xc5, 0x0a, 0xab, 0xf2, 0x7a, 0x75, 0x79, 0xde, 0xd7, 0x73,
-	0x47, 0xea, 0x5f, 0x30, 0x80, 0x35, 0x4d, 0x63, 0x9e, 0xb2, 0xa1, 0xa1, 0xf4, 0x64, 0x7a, 0x11,
-	0x8c, 0xa7, 0xc3, 0xa5, 0x27, 0xa1, 0x5f, 0xee, 0x2c, 0xdf, 0x88, 0x54, 0x45, 0x30, 0x21, 0xc6,
-	0x59, 0xc4, 0x74, 0x8f, 0x26, 0xad, 0x50, 0x95, 0x7c, 0x1a, 0x73, 0xc6, 0x57, 0x4c, 0xd7, 0x68,
-	0xd2, 0x86, 0x83, 0x31, 0x74, 0x42, 0x11, 0xcb, 0xb2, 0x17, 0xad, 0xd5, 0x06, 0x17, 0x7f, 0xb8,
-	0x90, 0xf5, 0x06, 0x4f, 0xf4, 0xfb, 0xdb, 0xfe, 0x40, 0x8c, 0xc7, 0x03, 0x31, 0x8e, 0x07, 0x82,
-	0x6e, 0x0a, 0x82, 0xee, 0x0a, 0x82, 0xee, 0x0b, 0x82, 0xf6, 0x05, 0x41, 0x4f, 0x05, 0x41, 0x2f,
-	0x05, 0x31, 0x8e, 0x05, 0x41, 0xb7, 0xcf, 0xc4, 0x58, 0x58, 0x7a, 0x4f, 0x3f, 0x5e, 0x03, 0x00,
-	0x00, 0xff, 0xff, 0x6d, 0x71, 0x26, 0x5c, 0x7b, 0x02, 0x00, 0x00,
+	// 500 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x92, 0xc1, 0x6e, 0x13, 0x3f,
+	0x10, 0xc6, 0xe3, 0xa4, 0x9b, 0x26, 0x93, 0xff, 0xbf, 0x8d, 0x2c, 0x84, 0x56, 0x08, 0x59, 0x51,
+	0x84, 0x50, 0x0e, 0x28, 0x07, 0x78, 0x01, 0xa0, 0x0d, 0x52, 0x24, 0x0e, 0xc8, 0xa4, 0x70, 0xde,
+	0xc6, 0xd3, 0xad, 0xd5, 0x8d, 0x37, 0xb2, 0x37, 0x51, 0x7b, 0xe3, 0x0d, 0xe0, 0x31, 0x78, 0x03,
+	0x5e, 0x01, 0x71, 0xea, 0x91, 0x23, 0x59, 0x2e, 0x1c, 0xfb, 0x08, 0x68, 0x1c, 0xef, 0x76, 0xc5,
+	0xed, 0xfb, 0xbe, 0x9d, 0xf5, 0xcc, 0xfc, 0x6c, 0x18, 0x64, 0x79, 0xaa, 0xcd, 0x74, 0x6d, 0xf3,
+	0x22, 0xe7, 0xfd, 0x34, 0x59, 0xa1, 0x97, 0xe3, 0xcf, 0x0c, 0x8e, 0xcf, 0x1c, 0xda, 0xb7, 0xf4,
+	0x59, 0xa2, 0xdb, 0x64, 0x05, 0x1f, 0x42, 0x67, 0xa3, 0x55, 0xcc, 0x46, 0x6c, 0xf2, 0xbf, 0x24,
+	0xc9, 0x47, 0x30, 0x48, 0x93, 0x02, 0x17, 0xcb, 0xf5, 0x2b, 0xa5, 0x6c, 0xdc, 0x1e, 0xb1, 0x49,
+	0x5f, 0x36, 0x23, 0x2e, 0x00, 0xc8, 0x7e, 0x74, 0xbe, 0xa0, 0xe3, 0x0b, 0x1a, 0x09, 0x9d, 0x79,
+	0x85, 0x37, 0xf1, 0x81, 0xff, 0x40, 0x92, 0x3f, 0x84, 0xae, 0xf5, 0xfd, 0xe2, 0x68, 0xc4, 0x26,
+	0x91, 0x0c, 0x6e, 0xfc, 0xa3, 0x0d, 0xff, 0xbd, 0xcb, 0x92, 0xe2, 0x22, 0xb7, 0x2b, 0x9a, 0x8c,
+	0x8e, 0x5e, 0x07, 0x3f, 0xdf, 0x4f, 0xd5, 0x97, 0x8d, 0x84, 0xbf, 0x84, 0x5e, 0xe5, 0xfc, 0x64,
+	0x47, 0xcf, 0x9f, 0x4c, 0xeb, 0x05, 0xa7, 0xcd, 0xa3, 0x6a, 0xb3, 0xb8, 0x59, 0xa3, 0xac, 0xff,
+	0xe2, 0x13, 0x38, 0xae, 0xf4, 0x7b, 0x74, 0x4e, 0xe7, 0x26, 0x6c, 0xf0, 0x6f, 0x4c, 0x20, 0xaa,
+	0xe8, 0x4c, 0x2b, 0xbf, 0x4e, 0x24, 0x9b, 0x11, 0x7f, 0x04, 0x3d, 0x87, 0x76, 0x8b, 0x76, 0x7e,
+	0x1a, 0x16, 0xab, 0x3d, 0x7f, 0x0c, 0xfd, 0xe5, 0x65, 0x62, 0x0c, 0x66, 0x73, 0x15, 0x77, 0x7d,
+	0x87, 0xfb, 0x80, 0xc7, 0x70, 0xb8, 0x45, 0xeb, 0xbb, 0x1f, 0xfa, 0x1f, 0x2b, 0x5b, 0xc1, 0xeb,
+	0xd5, 0xf0, 0xc6, 0x4f, 0xef, 0x19, 0xd1, 0x2e, 0x1c, 0xa0, 0x3b, 0x33, 0xa9, 0x36, 0x38, 0x6c,
+	0x91, 0x3e, 0x9d, 0x7d, 0x98, 0x9f, 0xcc, 0x86, 0xcb, 0xb1, 0x83, 0x41, 0xb8, 0xd9, 0x62, 0x63,
+	0x0d, 0xb5, 0x40, 0x6b, 0x4f, 0x72, 0x85, 0x9e, 0x63, 0x24, 0x2b, 0x4b, 0x90, 0xf7, 0x63, 0x2e,
+	0xf4, 0x0a, 0x3d, 0xc6, 0x48, 0x36, 0x12, 0xce, 0xe1, 0x20, 0xb1, 0xa9, 0x0b, 0x5c, 0xbc, 0xa6,
+	0x1b, 0x3c, 0x7f, 0xa3, 0xad, 0x2b, 0x02, 0x87, 0xe0, 0xc6, 0xdf, 0x18, 0xf4, 0x7d, 0xd7, 0xb9,
+	0xb9, 0xc8, 0xa9, 0xea, 0x12, 0x13, 0x15, 0xae, 0x2e, 0x92, 0xc1, 0xf1, 0x07, 0x10, 0x65, 0xb8,
+	0xc5, 0x2c, 0x34, 0xdb, 0x1b, 0x5a, 0x15, 0xaf, 0xd7, 0xbe, 0x4d, 0x47, 0x92, 0x24, 0xa0, 0x46,
+	0x2f, 0xaf, 0x4c, 0xb2, 0xc2, 0xf0, 0x7c, 0x6a, 0x4f, 0xd5, 0x0e, 0xaf, 0x03, 0x67, 0x92, 0xfc,
+	0x08, 0xda, 0x7a, 0xcf, 0xb6, 0x23, 0xdb, 0x5a, 0xd1, 0xdc, 0x69, 0x9e, 0xa9, 0x40, 0xd4, 0x6b,
+	0xa2, 0xa0, 0x74, 0xb2, 0xca, 0x8d, 0xf2, 0x48, 0x23, 0x59, 0xd9, 0xd7, 0xcf, 0x6e, 0x77, 0xa2,
+	0xf5, 0x73, 0x27, 0x5a, 0x77, 0x3b, 0xc1, 0x3e, 0x95, 0x82, 0x7d, 0x2d, 0x05, 0xfb, 0x5e, 0x0a,
+	0x76, 0x5b, 0x0a, 0xf6, 0xab, 0x14, 0xec, 0x4f, 0x29, 0x5a, 0x77, 0xa5, 0x60, 0x5f, 0x7e, 0x8b,
+	0xd6, 0x79, 0xd7, 0xbf, 0xb0, 0x17, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x91, 0x2d, 0xe9, 0xe5,
+	0x5c, 0x03, 0x00, 0x00,
 }

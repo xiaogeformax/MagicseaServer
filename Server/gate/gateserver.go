@@ -50,12 +50,11 @@ func (s *GateService) OnReceive(context service.Context) {
 		log.Info("msgs.RemoveAgentFromParent%v", msg.Uid)
 		delete(s.agents, msg.Uid)
 	case *NewAagentActorMsg:
-		// todo
-		/*ab := NewAgentActor(context, msg.Agent)
+		ab := NewAgentActor(context, msg.Agent)
 		pid := context.Spawn(actor.FromInstance(ab))
 		ab.pid = pid
 		ab.parentPid = context.Self()
-		context.Respond(&NewAagentActorResultMsg{Pid: pid})*/
+		context.Respond(&NewAagentActorResultMsg{Pid: pid})
 		// case *msgs.NewChild:
 		// 	//创建子节点
 		// 	ab := NewAgentActor(context)
@@ -72,7 +71,7 @@ func (s *GateService) OnReceive(context service.Context) {
 		//组todo:...
 		log.Info("gate.UnicastFrameMsg:", msg)
 
-	//case *msgs.BroadcastFrameMsg:
+	case *msgs.BroadcastFrameMsg:
 	case *msgs.BroadcastFrameMsgJson:
 		//广播
 		log.Info("gate.BroadcastFrameMsg:", msg, " child:", len(s.agents))
@@ -92,7 +91,7 @@ func (s *GateService) OnStart(as *service.ActorService) {
 	//as.RegisterMsg(reflect.TypeOf(&msgs.UserLogin{}), s.OnUserLogin) //注册登录
 	as.RegisterMsg(reflect.TypeOf(&msgs.Tick{}), s.OnTick)                    //定时任务
 	as.RegisterMsg(reflect.TypeOf(&msgs.Kick{}), s.OnKick)                    //踢人
-	//as.RegisterMsg(reflect.TypeOf(&msgs.AddServiceRep{}), s.OnRegOK)          //注册完成
+	as.RegisterMsg(reflect.TypeOf(&msgs.AddServiceRep{}), s.OnRegOK)          //注册完成
 	as.RegisterMsg(reflect.TypeOf(&actor.Terminated{}), s.OnDisconnectCenter) //被动断开服务器
 
 	log.Info("gate start")

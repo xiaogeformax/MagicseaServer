@@ -4,11 +4,13 @@ import (
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"time"
 	"log"
+	"sync"
 )
 
 type RemoteClient struct {
 	pid   *actor.PID
 	usage string
+	mutex sync.Mutex
 }
 
 //通知一条消息，立刻返回
@@ -18,6 +20,7 @@ func (client *RemoteClient) Tell(args interface{}) {
 
 //通知一条消息，阻塞等待结果
 func (client *RemoteClient) Ask(args interface{}) (interface{}, error) {
+
 	result, err := client.pid.RequestFuture(args, 3*time.Second).Result()
 	if err != nil {
 		log.Println("rpc ask fail:", err, " message:", args, " to ", client.usage)
@@ -33,3 +36,4 @@ func (client *RemoteClient) AskCB(args interface{}, respTo *actor.PID) {
 func (client *RemoteClient) GetActorPID() *actor.PID {
 	return client.pid
 }
+

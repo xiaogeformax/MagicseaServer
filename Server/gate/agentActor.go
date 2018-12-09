@@ -1,7 +1,7 @@
 package gate
 
 import (
-	gfw "MagicseaServer/GAServer/gateframework"
+	"MagicseaServer/GAServer/gateframework"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"MagicseaServer/gameproto/msgs"
 	"MagicseaServer/GAServer/log"
@@ -13,37 +13,42 @@ import (
 	"MagicseaServer/Server/cluster"
 	"time"
 	"MagicseaServer/GAServer/config"
+	"MagicseaServer/GAServer/service"
 )
 type AgentActor struct {
-	key string
-	verified bool
-	bindAgent gfw.Agent
-	pid *actor.PID
-	parentPid *actor.PID
-	baseInfo *msgs.UserBaseInfo
-	bindServers []*msgs.UserBindServer
-	wantDead bool
+	key         string
+	verified    bool
+	bindAgent   gateframework.Agent
+	pid         *actor.PID
+	parentPid   *actor.PID
+	baseInfo    *msgs.UserBaseInfo
+	bindServers map[int]*actor.PID
+	wantDead    bool
 }
 
-func NewAgentActor(ag gfw.Agent, parentPid *actor.PID) *AgentActor {
+func NewAgentActor(context service.Context, agent gateframework.Agent) *AgentActor {
 	//创建actor
-	ab := &AgentActor{verified: false, bindAgent: ag}
-	pid := actor.Spawn(actor.FromInstance(ab))
-
-
+	//r, err := parentPid.RequestFuture(&msgs.NewChild{}, 3*time.Second).Result()
+	ab := &AgentActor{verified: false, bindAgent: agent}
+	pid := context.Spawn(actor.FromInstance(ab))
 	ab.pid = pid
-	ab.parentPid = parentPid
-	log.Println("new agent actor:", pid, "  parent:", parentPid)
+	ab.parentPid = context.Self()
+	ab.bindServers = make(map[int]*actor.PID)
 	return ab
 }
 
+func (ab *AgentActor) getNetType() gateframework.NetType {
+	return ab.bindAgent.GetNetType()
+}
+
 //外部调用tell
-func (ab *AgentActor)Tell(msg proto.Message){
+func (ab *AgentActor) Tell(msg proto.Message) {
 
 }
 
 //收到后端消息
 func (ab *AgentActor) Receive(context actor.Context) {
+	//log.Info("agent.ReceviceServerMsg:", reflect.TypeOf(context.Message()))
 	switch msg := context.Message().(type) {
 	case *msgs.Kick:
 		ab.OnStop()
@@ -51,43 +56,46 @@ func (ab *AgentActor) Receive(context actor.Context) {
 		ab.bindAgent.SetDead() //被动死亡，防止二次关闭
 		ab.bindAgent.Close()   //关闭连接
 	case *msgs.ClientDisconnect:
+		//上报
 		if ab.baseInfo != nil {
 			ss := cluster.GetServicePID("session")
 			ss.Tell(&msgs.UserLeave{Uid: ab.baseInfo.Uid, From: msgs.ST_GateServer, Reason: "client disconnect"})
 		}
 		ab.OnStop()
 		context.Self().Stop()
-
 	case *msgs.ReceviceClientMsg:
 		//收到客户端消息
 		ab.ReceviceClientMsg(msg.Rawdata)
+	case *msgs.FrameMsg:
+		ab.SendClientPack(msg.MsgId, msg.RawData)
+	case *msgs.FrameMsgJson:
+		ab.SendClientPack(msg.MsgId, msg.RawData)
+	case *msgs.AttachBattle:
+		ab.bindServers[int(msgs.BattleServer)] = msg.RoomPID
+	case *msgs.DetachBattle:
+		delete(ab.bindServers, int(msgs.BattleServer))
 	}
 }
 
-func (ab *AgentActor) GetNetPack() NetPack {
-	return GetNetPackByConf()
-}
-
 func (ab *AgentActor) GetChannelServer(channel int) *actor.PID {
-	c := msgs.ChannelType(int(channel) / 100 * 100) //简单对应
+	c := msgs.ChannelType(channel / 100 * 100) //简单对应
 	//log.Info("GetChannelServer,%v,%v", channel, c)
 	if ab.bindServers == nil {
 		return nil
 	}
-	for _, v := range ab.bindServers {
-		//log.Info("try GetChannelServer,%v", v.Channel)
-		if v.Channel == c {
-			return v.GetPid()
-		}
+	if pid, ok := ab.bindServers[int(c)]; ok {
+		return pid
 	}
 	return nil
 }
-
+func (ab *AgentActor) GetNetPack() NetPack {
+	return GetNetPackByConf()
+}
 
 //收到前端消息
 func (ab *AgentActor) ReceviceClientMsg(data []byte) error {
+	//log.Info("ReceviceClientMsg:", len(data), data)
 	pack := ab.GetNetPack()
-
 	msgId, rawdata, err := pack.Unmarshal(data)
 	if msgId != "b_move" {
 		log.Info("recv:%v", msgId)
@@ -97,14 +105,13 @@ func (ab *AgentActor) ReceviceClientMsg(data []byte) error {
 		log.Error("pack.Unmarshal error:%v,%v", data, err)
 		return errors.New("AgentActor recv too short")
 	}
-
-
 	//心跳包
 	channel := pack.GetChannelType(msgId)
-	if channel ==ChannelHeartbeat {
+	if channel == ChannelHeartbeat {
 		ab.SendClientPack(msgId, rawdata)
 		return nil
 	}
+
 	//认证
 	if !ab.verified {
 		return ab.CheckLogin(msgId, rawdata)
@@ -116,44 +123,91 @@ func (ab *AgentActor) ReceviceClientMsg(data []byte) error {
 
 //验证消息
 func (ab *AgentActor) CheckLogin(msgId interface{}, rawdata []byte) error {
-	log.Info("checklogin....")
+	log.Info("checklogin:%s", string(rawdata))
 	msg := gameproto.PlatformUser{}
-	err := proto.Unmarshal(rawdata, &msg)
+	err := gp.Unmarshal(rawdata, &msg)
 	if err != nil {
 		log.Error("CheckLogin fail:%v,msgid:%v", err, msgId)
 		return err
 	}
-
-	//todo cluster
 	pretime := time.Now()
-	smsg := &msgs.ServerCheckLogin{Uid: uint64(msg.PlatformUid), Key: msg.Key, AgentPID: ab.pid}
-	result, err := cluster.GetServicePID("session").Ask(smsg)
 
+	// smsg := &msgs.ServerCheckLogin{Uid: uint64(msg.PlatformUid), Key: msg.Key, AgentPID: ab.pid}
+	// result, err := cluster.GetServicePID("session").Ask(smsg)
+	// if err == nil {
+	// 	checkResult := result.(*msgs.CheckLoginResult)
+	// 	if checkResult.Result == msgs.OK {
+	// 		//登录成功
+	// 		usetime := time.Now().Sub(pretime)
+	// 		log.Info("CheckLogin success:%v,time:%v", checkResult, usetime.Seconds())
+	// 		ab.baseInfo = checkResult.BaseInfo
+	// 		for _, s := range checkResult.BindServers {
+	// 			if s.Pid != nil {
+	// 				ab.bindServers[int(s.Channel)] = s.Pid
+	// 			}
+	// 		}
+	// 		ab.verified = true
+	// 		ab.parentPid.Tell(&msgs.AddAgentToParent{Uid: checkResult.BaseInfo.Uid, Sender: ab.pid})
+	// 	} else {
+	// 		log.Info("###CheckLogin fail:", checkResult)
+	// 	}
+
+	// 	ret := &gameproto.LoginReturn{ErrCode: int32(checkResult.Result), ServerTime: int32(time.Now().Unix())}
+	// 	ab.SendClient(msgId, ret)
+
+	// } else {
+	// 	log.Error("CheckLogin error :" + err.Error())
+	// }
+	spid, code := GetBestGameserver()
+	if code != msgs.OK {
+		log.Error("GetBestGameserver error:%v", code)
+		return errors.New("GetBestGameserver error")
+	}
+	smsg := &msgs.ServerCheckLogin{Uid: uint64(msg.PlatformUid), Key: msg.Key, AgentPID: ab.pid}
+	result, err := spid.RequestFuture(smsg, time.Second*3).Result()
 	if err == nil {
+		//登录成功
 		checkResult := result.(*msgs.CheckLoginResult)
 		if checkResult.Result == msgs.OK {
 			//登录成功
 			usetime := time.Now().Sub(pretime)
 			log.Info("CheckLogin success:%v,time:%v", checkResult, usetime.Seconds())
 			ab.baseInfo = checkResult.BaseInfo
-			ab.bindServers = checkResult.BindServers
+			for _, s := range checkResult.BindServers {
+				if s.Pid != nil {
+					ab.bindServers[int(s.Channel)] = s.Pid
+				}
+			}
 			ab.verified = true
 			ab.parentPid.Tell(&msgs.AddAgentToParent{Uid: checkResult.BaseInfo.Uid, Sender: ab.pid})
+
+			ret := &gameproto.LoginReturn{ErrCode: int32(checkResult.Result), ServerTime: int32(time.Now().Unix())}
+			ab.SendClient(msgId, ret)
+
 		} else {
-			log.Println("###CheckLogin fail:", checkResult)
+			log.Info("###CheckLogin fail:", checkResult)
 		}
-
-		ret := &gameproto.LoginReturn{ErrCode: int32(checkResult.Result), ServerTime: int32(time.Now().Unix())}
-		ab.SendClient(msgId,ret)
-
 	} else {
 		log.Error("CheckLogin error :" + err.Error())
 	}
 
 	return nil
 }
+
+//均衡负载选择服务器
+func GetBestGameserver() (*actor.PID, msgs.GAErrorCode) {
+	//请求gameserver
+	result, err := cluster.GetServicePID("center").Ask(&msgs.ApplyService{"game"})
+	if err != nil {
+		log.Error("get gameserver error:%v", err)
+		return nil, msgs.Error
+	}
+	sr := result.(*msgs.ApplyServiceResult)
+	return sr.Pid, msgs.OK
+}
+
 //发送消息到客户端
-func (ab *AgentActor) SendClient(msgId interface{},  msg proto.Message ) {
+func (ab *AgentActor) SendClient(msgId interface{}, msg proto.Message) {
 	mdata, err := gp.Marshal(msg)
 	if err != nil {
 		log.Error("SendClient marshal error:%v", err)
@@ -183,7 +237,6 @@ func (ab *AgentActor)  forward(msgId interface{}, rawdata []byte, channel Channe
 	//	ab.SendClient(msgs.Shop, byte(msgs.S2C_ShopBuy), &msgs.S2C_ShopBuyMsg{ItemId: 1, Result: msgs.OK})
 	//	return nil
 	//}
-
 	if msgId != "b_move" {
 		log.Info("=========>forward msg:%v", msgId)
 	}

@@ -70,7 +70,7 @@ func (s *CenterService) OnAddService(context service.Context) {
 	group.AddService(node)                 //加入group
 	context.Watch(node.pid)                //监控
 
-	context.Request(context.Sender(), &msgs.AddService{})
+	context.Request(context.Sender(), &msgs.AddServiceRep{})
 	log.Info("center.OnAddService  OK:%s", msg.ServiceName)
 }
 
@@ -131,7 +131,7 @@ func (s *CenterService) OnApplyService(context service.Context) {
 	msg := context.Message().(*msgs.ApplyService)
 	var group *ServiceGroup
 	if g, ok := s.serviceGroups[msg.ServiceType]; !ok {
- 		log.Error("OnApplyService,no found service Type:%v", msg.ServiceType)
+		log.Error("OnApplyService,no found service Type:%v", msg.ServiceType)
 		context.Sender().Tell(&msgs.ApplyServiceResult{Result: msgs.Error})
 		return
 	} else {

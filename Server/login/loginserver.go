@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-type LoginService struct{
+type LoginService struct {
 	service.ServiceData
 }
 
@@ -28,6 +28,7 @@ func Service() service.IService {
 func Type() string {
 	return "login"
 }
+
 //以下为接口函数
 func (s *LoginService) OnReceive(context service.Context) {
 	fmt.Println("center.OnReceive:", context.Message())
@@ -37,46 +38,55 @@ func (s *LoginService) OnInit() {
 }
 
 func (s *LoginService) OnStart(as *service.ActorService) {
+	//as.RegisterMsg(reflect.TypeOf(&messages.UserLogin{}), s.OnUserLogin) //注册登录
 
+	//开启rpc,任意端口
+	//remote.Start("127.0.0.1:0")
+	//cluster.Start(&cluster.ClusterConfig{"127.0.0.1:8090", "127.0.0.1:8091"})
 
 	go func() {
 		//开启http服务
 		http.HandleFunc("/login", login)
-
 		http.HandleFunc("/regist", regist)
 		httpAddr := config.GetServiceConfigString(s.Name, "httpAddr")
-		log.Println("login listen http:", s.Name, "  ", httpAddr)
+		log.Info("login listen http:", s.Name, "  ", httpAddr)
 		http.ListenAndServe(httpAddr, nil)
 	}()
+
 }
 
 //注册
 func regist(w http.ResponseWriter, req *http.Request) {
-
-	log.Info("=========打开  注册 ============")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	req.ParseForm()
-	if req.Form["a"] ==nil || req.Form["p"] == nil{
-		log.Error("a,p is empty :",req.Form)
+	if req.Form["a"] == nil || req.Form["p"] == nil {
+		log.Error("a,p is empty:", req.Form)
 		return
 	}
 	//账号
 	acc := ""
-	if al,ok := req.Form["a"];ok{
+	if al, ok := req.Form["a"]; ok {
 		acc = al[0]
 	}
 	//密码
-	pwd:= ""
+	pwd := ""
 	if al, ok := req.Form["p"]; ok {
 		pwd = al[0]
 	}
+
 	if len(acc) < 1 || len(pwd) < 1 {
 		registBackError(w, "账号密码都不能为空", nil)
 		return
 	}
+
 	log.Info("reg account:acc=%s,pwd=%s", acc, pwd)
+
 	key := "User:nameindex:" + acc
 	r := db.GetRedisGame().Get(key).Val()
+	// if err1!=nil {
+	// 	registBackError(w,"数据插入,获取索引出错",err1)
+	// 	return;
+	// }
 	if len(r) > 0 {
 		registBackError(w, "已经存在的账号", nil)
 		return
@@ -89,6 +99,7 @@ func regist(w http.ResponseWriter, req *http.Request) {
 		registBackError(w, "数据插入id出错", err2)
 		return
 	}
+
 	var user = &db.User{Id: id, Account: acc, Password: pwd, RegisterTime: time.Now().Unix()}
 	if err := db.SetRedisObject(user, id, gamedb); err != nil {
 		registBackError(w, "数据插入出错", err)
@@ -99,15 +110,16 @@ func regist(w http.ResponseWriter, req *http.Request) {
 	db.GetRedisGame().Set(key, id, 0)
 
 	w.Write([]byte("success"))
-
 }
+
 func registBackError(w http.ResponseWriter, val string, e error) {
 	log.Error("create user db error:%s,%v", val, e)
 	w.Write([]byte(val))
 }
 
+//登录
 func login(w http.ResponseWriter, req *http.Request) {
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	req.ParseForm()
 	if req.Form["a"] == nil || req.Form["p"] == nil {
 		log.Error("a,p is empty:", req.Form)
@@ -124,14 +136,18 @@ func login(w http.ResponseWriter, req *http.Request) {
 		pwd = pl[0]
 	}
 
+	//协议，默认pb，否则json
+	// proto:="pb"
+	// if al, ok := req.Form["proto"]; ok {
+	// 	proto = al[0]
+	// }
+
+	//验证 here...
 	log.Info("login account:acc=%s,pwd=%s", acc, pwd)
-
 	gamedb := db.GetRedisGame()
-
 	//索引
 	key := "User:nameindex:" + acc
 	r, err := db.GetRedisGame().Get(key).Result()
-
 	if err != nil {
 		loginBackError(w, "get username error:"+key, err)
 		return
@@ -170,6 +186,7 @@ func login(w http.ResponseWriter, req *http.Request) {
 		log.Info("login error:", acc, err)
 	}
 }
+
 //玩家登陆
 func OnUserLogin(id uint64) (*gameproto.UserLoginResult, error) {
 	//请求gate
@@ -206,8 +223,9 @@ func GetServiceValue(key string, values []*msgs.ServiceValue) string {
 	return ""
 }
 
-func loginBackError(w http.ResponseWriter,info string, e error) {
-	log.Error("create user db :%v",info, e)
-	d, _ := proto.Marshal(&gameproto.UserLoginResult{Result: int32(msgs.Error)})
+func loginBackError(w http.ResponseWriter, info string, e error) {
+	log.Error("login user db fail:%v,%v", info, e)
+	var m = &gameproto.UserLoginResult{Result: int32(msgs.Error)}
+	d, _ := proto.Marshal(m)
 	w.Write(d)
 }

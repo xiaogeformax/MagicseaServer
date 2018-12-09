@@ -6,7 +6,6 @@ import (
 	"MagicseaServer/GAServer/module"
 
 	"MagicseaServer/GAServer/log"
-	"github.com/magicsea/ganet/util"
 	"os/signal"
 	"os"
 )
@@ -40,7 +39,8 @@ func Run(conf *ServiceConfig, ms ...module.IModule) {
 
 		defer log.Close()
 	}
-	defer util.PrintPanicStack()
+	//todo util
+	//defer util.PrintPanicStack()
 	log.Info("log.started")
 	modules = ms
 	for _, m := range modules {

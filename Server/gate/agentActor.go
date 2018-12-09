@@ -49,6 +49,9 @@ func (ab *AgentActor) Tell(msg proto.Message) {
 //收到后端消息
 func (ab *AgentActor) Receive(context actor.Context) {
 	//log.Info("agent.ReceviceServerMsg:", reflect.TypeOf(context.Message()))
+	hjhh := context.Message()
+	log.Println("",hjhh)
+
 	switch msg := context.Message().(type) {
 	case *msgs.Kick:
 		ab.OnStop()

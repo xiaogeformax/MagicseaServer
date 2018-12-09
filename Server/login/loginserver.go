@@ -11,7 +11,7 @@ import (
 	"MagicseaServer/Server/cluster"
 	"MagicseaServer/gameproto/msgs"
 	"MagicseaServer/gameproto"
-	"github.com/gogo/protobuf/proto"
+	"MagicseaServer/GAServer/proto"
 	"MagicseaServer/Server/db"
 	"time"
 )

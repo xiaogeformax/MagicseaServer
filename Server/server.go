@@ -11,6 +11,7 @@ import (
 	"MagicseaServer/Server/cluster"
 	"MagicseaServer/Server/gate"
 	"MagicseaServer/Server/session"
+	"MagicseaServer/Server/game"
 )
 
 var (
@@ -30,6 +31,7 @@ func main(){
 	app.RegisterService(session.Type(), session.Service)
 	app.RegisterService(login.Type(), login.Service)
 	app.RegisterService(gate.Type(), gate.Service)
+	app.RegisterService(game.Type(), game.Service)
 
 	log.Println("===Run===", conf)
 	app.Run(&conf.Base, cluster.New(), db.NewRedisMgr())

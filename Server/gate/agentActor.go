@@ -49,9 +49,6 @@ func (ab *AgentActor) Tell(msg proto.Message) {
 //收到后端消息
 func (ab *AgentActor) Receive(context actor.Context) {
 	//log.Info("agent.ReceviceServerMsg:", reflect.TypeOf(context.Message()))
-	hjhh := context.Message()
-	log.Println("",hjhh)
-
 	switch msg := context.Message().(type) {
 	case *msgs.Kick:
 		ab.OnStop()
@@ -193,7 +190,6 @@ func (ab *AgentActor) CheckLogin(msgId interface{}, rawdata []byte) error {
 	} else {
 		log.Error("CheckLogin error :" + err.Error())
 	}
-
 	return nil
 }
 
@@ -218,23 +214,30 @@ func (ab *AgentActor) SendClient(msgId interface{}, msg proto.Message) {
 	}
 	//log.Info("sendclient:msg%v,data:%d=>%v", pack.msgID, len(pack.rawData), pack.rawData)
 	ab.SendClientPack(msgId, mdata)
-
 }
 
+//func (ab *AgentActor) SendClientRaw(c msgs.ChannelType, msgId byte, mdata []byte) {
+//	data := []byte{byte(c), msgId}
+//	data = append(data, mdata...)
+//	ab.bindAgent.WriteMsg(data)
+//}
+
 func (ab *AgentActor) SendClientPack(msgId interface{}, rawdata []byte) {
+	//data := pack.Write()
 	var pack = ab.GetNetPack()
 	data, err := pack.Marshal(msgId, rawdata)
 	if err != nil {
 		log.Error("SendClientPack marshal error:id=%v,%s", msgId, err.Error())
 		return
 	}
+	// if msgId != "snap" {
+	// 	log.Info("send:%s,id=%s,r=%s", string(data), msgId, string(rawdata))
+	// }
 	ab.bindAgent.WriteMsg(data)
 }
 
 //转发
-func (ab *AgentActor)  forward(msgId interface{}, rawdata []byte, channel ChannelType) error {
-	//channel := pack.channel
-	//msgid := pack.msgID
+func (ab *AgentActor) forward(msgId interface{}, rawdata []byte, channel ChannelType) error {
 	//test gate
 	//if channel == byte(msgs.Shop) {
 	//	ab.SendClient(msgs.Shop, byte(msgs.S2C_ShopBuy), &msgs.S2C_ShopBuyMsg{ItemId: 1, Result: msgs.OK})
@@ -257,8 +260,6 @@ func (ab *AgentActor)  forward(msgId interface{}, rawdata []byte, channel Channe
 		pid.Request(frame, ab.pid)
 	}
 
-	//frame := &msgs.FrameMsg{channel, uint32(msgid), pack.rawData}
-	//pid.Tell(frame)
 	//r, e := pid.RequestFuture(frame, time.Second*3).Result()
 	//if e != nil {
 	//	log.Error("forward error:id=%v, err=%v", ab.baseInfo.Uid, e)

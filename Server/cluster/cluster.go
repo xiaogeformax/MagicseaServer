@@ -2,9 +2,9 @@ package cluster
 
 import (
 	"sync"
-	"MagicseaServer/GAServer/config"
 	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
+	"MagicseaServer/GAServer/config"
 )
 
 var (
@@ -20,14 +20,14 @@ func New() *Clustermgr {
 }
 
 func (mgr *Clustermgr) OnInit() bool {
-	remoteClients = make(map[string]*RemoteClient)
+	/*remoteClients = make(map[string]*RemoteClient)
 	if config.GetGlobleConfig().RemoteAddrs != nil {
 		fmt.Println("remote:", config.GetGlobleConfig().RemoteAddrs)
 		for serviceName, addr := range config.GetGlobleConfig().RemoteAddrs {
 			createClient(addr, serviceName)
 		}
 
-	}
+	}*/
 
 	return true
 }
@@ -41,12 +41,14 @@ func (mgr *Clustermgr) OnDestroy() {
 
 func GetServicePID(serviceName string) *RemoteClient {
 	//todo:unsafe 频繁请求,可能有竞态，正式环境静态点要标明remote
-	if client := remoteClients[serviceName]; client != nil {
+	/*if client := remoteClients[serviceName]; client != nil {
 		return client
 	} else {
 		addr := config.GetServiceAddress(serviceName)
 		return createClient(addr, serviceName)
-	}
+	}*/
+	addr := config.GetServiceAddress(serviceName)
+	return createClient(addr, serviceName)
 }
 
 func createClient(addr string, serviceName string) *RemoteClient {

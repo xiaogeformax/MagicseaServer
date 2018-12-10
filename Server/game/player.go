@@ -8,12 +8,13 @@ import (
 	"MagicseaServer/GAServer/log"
 	"fmt"
 	"MagicseaServer/Server/db"
-	"ga_server/src/GAServer/util"
+
 	"MagicseaServer/gameproto"
 	"MagicseaServer/Server/cluster"
 	"github.com/gogo/protobuf/proto"
 	"MagicseaServer/GAServer/config"
 	gp "github.com/magicsea/ganet/proto"
+	"github.com/magicsea/ganet/util"
 )
 
 type Player struct {

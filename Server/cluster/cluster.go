@@ -2,7 +2,6 @@ package cluster
 
 import (
 	"sync"
-	"fmt"
 	"github.com/AsynkronIT/protoactor-go/actor"
 	"MagicseaServer/GAServer/config"
 )
@@ -54,7 +53,7 @@ func GetServicePID(serviceName string) *RemoteClient {
 func createClient(addr string, serviceName string) *RemoteClient {
 	//mutex.Lock()
 	//defer mutex.Unlock()
-	fmt.Println("createClient:", serviceName, addr)
+	//fmt.Println("createClient:", serviceName, addr)
 	r := &RemoteClient{}
 	if addr != "" {
 		r.pid = actor.NewPID(addr, serviceName)

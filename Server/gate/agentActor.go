@@ -14,6 +14,7 @@ import (
 	"time"
 	"MagicseaServer/GAServer/config"
 	"MagicseaServer/GAServer/service"
+	"reflect"
 )
 type AgentActor struct {
 	key         string
@@ -48,7 +49,8 @@ func (ab *AgentActor) Tell(msg proto.Message) {
 
 //收到后端消息
 func (ab *AgentActor) Receive(context actor.Context) {
-	//log.Info("agent.ReceviceServerMsg:", reflect.TypeOf(context.Message()))
+
+	log.Info("agent.ReceviceServerMsg:", reflect.TypeOf(context.Message()))
 	switch msg := context.Message().(type) {
 	case *msgs.Kick:
 		ab.OnStop()

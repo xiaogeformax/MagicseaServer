@@ -7,6 +7,7 @@ import (
 	"log"
 	"reflect"
 	"MagicseaServer/GAServer/network"
+	"MagicseaServer/gameproto/msgs"
 )
 
 type NetType byte
@@ -67,7 +68,7 @@ func (a *GFAgent) Run() {
 			}
 		}else {
 			//todo:not safe protobuf
-			//a.agentActor.Tell(&msgs.ReceviceClientMsg{data})
+			a.agentActor.Tell(&msgs.ReceviceClientMsg{data})
 
 
 			//if err != nil {
